@@ -9,6 +9,7 @@ authors = [
 ]
 requires-python = ">=3.10"
 dependencies = [
+    "numpy (>=2.2.2,<3.0.0)"
 ]
 
 [build-system]
@@ -17,6 +18,7 @@ build-backend = "poetry.core.masonry.api"
 
 [project.scripts]
 gather = "py_crispr_analyser.gather:run"
+index = "py_crispr_analyser.index:run"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"

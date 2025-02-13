@@ -5,6 +5,8 @@ import re
 import sys
 import time
 
+GUIDE_RNA_LENGTH = 20
+
 
 def reverse_complement(sequence: str) -> str:
     """Return the reverse complement of a DNA sequence.
@@ -57,7 +59,7 @@ def gather(inputfile: str, outputfile: str, pam: str, verbose: bool = False):
     chromosome = ""
     crispr_count = 0
     position = 0
-    buffer = collections.deque(maxlen=len(pam) + 20)
+    buffer = collections.deque(maxlen=len(pam) + GUIDE_RNA_LENGTH)
 
     with open(inputfile, "r") as infile:
         with open(outputfile, "w", newline="") as outfile:
@@ -78,7 +80,7 @@ def gather(inputfile: str, outputfile: str, pam: str, verbose: bool = False):
                     line = line.strip()
                     for base in line:
                         buffer.append(base)
-                        if len(buffer) < len(pam) + 20:
+                        if len(buffer) < len(pam) + GUIDE_RNA_LENGTH:
                             continue
                         position += 1
                         if match_pam(
@@ -105,23 +107,30 @@ def gather(inputfile: str, outputfile: str, pam: str, verbose: bool = False):
 
 
 def run(argv=sys.argv[1:]):
-    """Run the CRISPR gatherer."""
+    """Run the CRISPR gatherer from the command line."""
     inputfile = ""
     outputfile = ""
     pam = ""
 
     def usage():
-        print("gather -i <inputfile> -o <CSV outputfile> -p <pam>")
+        print(
+            """Usage: poetry run gather [options...]
+-h, --help           Print this help message
+-i, --ifile <file>   The input FASTA file
+-o, --ofile <file>   The output file
+-p, --pam <pam seq>  The PAM sequence to search for
+"""
+        )
 
     try:
         opts, args = getopt.getopt(
-            argv, "hi:o:p:", ["ifile=", "ofile=", "pam="]
+            argv, "hi:o:p:", ["help", "ifile=", "ofile=", "pam="]
         )
     except getopt.GetoptError:
         usage()
         sys.exit(2)
     for opt, arg in opts:
-        if opt == "-h":
+        if opt in ("-h", "--help"):
             usage()
             sys.exit()
         elif opt in ("-i", "--ifile"):
@@ -130,6 +139,10 @@ def run(argv=sys.argv[1:]):
             outputfile = arg
         elif opt in ("-p", "--pam"):
             pam = arg
+        else:
+            print("Unhandled Option")
+            usage()
+            sys.exit(2)
     if inputfile == "" or outputfile == "" or pam == "":
         usage()
         sys.exit(2)
