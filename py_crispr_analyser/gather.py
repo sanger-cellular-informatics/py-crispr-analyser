@@ -5,18 +5,9 @@ import re
 import sys
 import time
 
+from .utils import reverse_complement
+
 GUIDE_RNA_LENGTH = 20
-
-
-def reverse_complement(sequence: str) -> str:
-    """Return the reverse complement of a DNA sequence.
-
-    Args:
-        sequence: The string DNA sequence to reverse complement.
-    """
-    complement_map = {"A": "T", "C": "G", "G": "C", "T": "A", "N": "N"}
-    return "".join([complement_map[base] for base in reversed(sequence)])
-
 
 def match_pam(
     dna_sequence: str,

@@ -90,6 +90,18 @@ The CSV input file must have the following fields:
 
 Note that *Species ID* is a legacy field and is not used in the current version of the software.
 
+### Search
+
+To run the **Search** command:
+
+```bash
+poetry run search -i <input_bin> -s <search_guide_sequence>
+```
+
+The parameters are:
+- -i, --ifile - The Input binary guides file - *Mandatory*,
+- -s, --search - The search guide sequence - *Mandatory*.
+
 ## Testing
 
 To run the unit tests:

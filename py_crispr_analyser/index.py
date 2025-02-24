@@ -4,9 +4,12 @@ import struct
 import sys
 import time
 
-CMAP = {"A": 0, "C": 1, "G": 2, "T": 3, "N": 4}
-ERROR_STR = np.uint64(0xFFFFFFFFFFFFFFFF)
-FILE_VERSION = np.uint16(3)
+from .utils import (
+    COMPLEMENT_MAP,
+    ERROR_STR,
+    FILE_VERSION,
+    sequence_to_binary_encoding,
+)
 
 
 def create_metadata(
@@ -71,24 +74,6 @@ def parse_record(record: str, guide_length: int, pam_length: int) -> (str, int):
     else:
         guide_sequence = crispr_sequence[:guide_length]
     return guide_sequence, pam_right
-
-
-def sequence_to_binary_encoding(sequence: str, pam_right: int) -> np.uint64:
-    """Convert a string DNA sequence to bits accounting for pam right or left
-
-    Args:
-        sequence: The string DNA sequence to convert
-        pam_right: An integer indicating if PAM is on the right
-    """
-    bits = np.uint64(pam_right)
-    for c in sequence:
-        if CMAP[c] == 4:
-            bits = ERROR_STR  # set the error flag if we encounter an 'N'
-            break
-        else:
-            bits <<= 2  # shift left to make room for new char
-            bits |= CMAP[c]  # add our new char to the end
-    return bits
 
 
 def index(
