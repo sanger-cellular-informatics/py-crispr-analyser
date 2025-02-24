@@ -19,6 +19,7 @@ build-backend = "poetry.core.masonry.api"
 [project.scripts]
 gather = "py_crispr_analyser.gather:run"
 index = "py_crispr_analyser.index:run"
+search = "py_crispr_analyser.search:run"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"

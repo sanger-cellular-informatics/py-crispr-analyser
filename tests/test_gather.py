@@ -2,10 +2,6 @@ import pytest
 import py_crispr_analyser.gather as gather
 
 
-def test_reverse_complement():
-    assert gather.reverse_complement("ATCGN") == "NCGAT"
-
-
 class TestMatchPam:
     def test_N_in_pam_sequence(self):
         """Test that N acts like a wildcard in the PAM sequence"""
@@ -86,18 +82,19 @@ class TestMatchPam:
         )
 
 
-class Testrun:
-    @pytest.fixture
-    def single_chromosome_fasta(tmp_path):
-        """Test fixture for a single chromosome fasta file"""
-        return """>MT dna:chromosome chromosome:GRCh38:MT:1:16569:1 REF
+@pytest.fixture
+def single_chromosome_fasta():
+    """Test fixture for a single chromosome fasta file"""
+    return """>MT dna:chromosome chromosome:GRCh38:MT:1:16569:1 REF
 GATCACAGGTCTATCACCCTATTAACCACTCACGGGAGCTCTCCATGCATTTGGTATTTT
 CGTCTGGGGGGTATGCACGCGATAGCATTGCGAGACGCTGGAGCCGGAGCACCCTATGTC
 GCAGTATCTGTCTTTGATTCCTGCCTCATCCTATTATTTATCGCACCTACGTTCAATATT"""
 
-    def test_with_ngg_pam(self, tmp_path, single_chromosome_fasta):
-        """Test that we can run with 'NGG' PAM"""
-        expected_csv = """MT,13,ATCACCCTATTAACCACTCACGG,1,1
+
+@pytest.fixture
+def expected_csv_with_ngg_pam():
+    """Test fixture for output CSV with 'NGG' PAM"""
+    return """MT,13,ATCACCCTATTAACCACTCACGG,1,1
 MT,14,TCACCCTATTAACCACTCACGGG,1,1
 MT,17,CCCTATTAACCACTCACGGGAGC,0,1
 MT,18,CCTATTAACCACTCACGGGAGCT,0,1
@@ -118,18 +115,12 @@ MT,140,CCTGCCTCATCCTATTATTTATC,0,1
 MT,144,CCTCATCCTATTATTTATCGCAC,0,1
 MT,150,CCTATTATTTATCGCACCTACGT,0,1
 """
-        d = tmp_path / "test"
-        d.mkdir()
-        infile = d / "test.fasta"
-        infile.write_text(single_chromosome_fasta)
-        outfile = d / "test.csv"
-        args = ["-i", infile, "-o", outfile, "-p", "NGG"]
-        gather.run(args)
-        assert outfile.read_text() == expected_csv
 
-    def test_with_ngn_pam(self, tmp_path, single_chromosome_fasta):
-        """Test that we can run with 'NGN' PAM"""
-        expected_csv = """MT,3,TCACAGGTCTATCACCCTATTAA,0,1
+
+@pytest.fixture
+def expected_csv_with_ngn_pam():
+    """Test fixture for ouput with 'NGN' PAM"""
+    return """MT,3,TCACAGGTCTATCACCCTATTAA,0,1
 MT,5,ACAGGTCTATCACCCTATTAACC,0,1
 MT,10,TCTATCACCCTATTAACCACTCA,0,1
 MT,13,ATCACCCTATTAACCACTCACGG,1,1
@@ -209,22 +200,20 @@ MT,149,TCCTATTATTTATCGCACCTACG,0,1
 MT,150,CCTATTATTTATCGCACCTACGT,0,1
 MT,150,CCTATTATTTATCGCACCTACGT,1,1
 """
-        d = tmp_path / "test"
-        d.mkdir()
-        infile = d / "test.fasta"
-        infile.write_text(single_chromosome_fasta)
-        outfile = d / "test.csv"
-        args = ["-i", infile, "-o", outfile, "-p", "NGN"]
-        gather.run(args)
-        assert outfile.read_text() == expected_csv
 
-    def test_fasta_multiple_chromasomes(self, tmp_path):
-        """Test that we can run with a fasta file with multiple chromosomes"""
-        fasta_content = """>MT dna:chromosome chromosome:GRCh38:MT:1:16569:1 REF
+
+@pytest.fixture
+def multiple_chromasomes_fasta():
+    """Test that we can run with a fasta file with multiple chromosomes"""
+    return """>MT dna:chromosome chromosome:GRCh38:MT:1:16569:1 REF
 GATCACAGGTCTATCACCCTATTAACCACTCACGGGAGCTCTCCATGCATTTGGTATTTT
 >X dna:chromosome chromosome:GRCh38:X:1:156040895:1 REF
 ACAGGCGAACATACTTACTAAAGTGTGTTAATTAATTAATGCTTGTAGGACATAATAATA"""
-        expected_csv = """MT,13,ATCACCCTATTAACCACTCACGG,1,1
+
+
+@pytest.fixture
+def expected_csv_with_multiple_chromosomes():
+    return """MT,13,ATCACCCTATTAACCACTCACGG,1,1
 MT,14,TCACCCTATTAACCACTCACGGG,1,1
 MT,17,CCCTATTAACCACTCACGGGAGC,0,1
 MT,18,CCTATTAACCACTCACGGGAGCT,0,1
@@ -232,11 +221,105 @@ MT,26,CCACTCACGGGAGCTCTCCATGC,0,1
 MT,32,ACGGGAGCTCTCCATGCATTTGG,1,1
 X,27,GTTAATTAATTAATGCTTGTAGG,1,1
 """
+
+
+class TestRun:
+    """Test the command line run function"""
+    def test_with_ngg_pam(
+        self, tmp_path, single_chromosome_fasta, expected_csv_with_ngg_pam
+    ):
+        """Test that we can run the script with NGG PAM""",
         d = tmp_path / "test"
         d.mkdir()
         infile = d / "test.fasta"
-        infile.write_text(fasta_content)
+        infile.write_text(single_chromosome_fasta)
         outfile = d / "test.csv"
         args = ["-i", infile, "-o", outfile, "-p", "NGG"]
         gather.run(args)
-        assert outfile.read_text() == expected_csv
+        assert outfile.read_text() == expected_csv_with_ngg_pam
+
+    def test_with_ngn_pam(
+        self, tmp_path, single_chromosome_fasta, expected_csv_with_ngn_pam
+    ):
+        """Test that we can run the script with NGN PAM"""
+        d = tmp_path / "test"
+        d.mkdir()
+        infile = d / "test.fasta"
+        infile.write_text(single_chromosome_fasta)
+        outfile = d / "test.csv"
+        args = ["-i", infile, "-o", outfile, "-p", "NGN"]
+        gather.run(args)
+        assert outfile.read_text() == expected_csv_with_ngn_pam
+
+    def test_with_multiple_chromosomes(
+        self,
+        tmp_path,
+        multiple_chromasomes_fasta,
+        expected_csv_with_multiple_chromosomes,
+    ):
+        """Test that we can run the script with multiple chromosomes"""
+        d = tmp_path / "test"
+        d.mkdir()
+        infile = d / "test.fasta"
+        infile.write_text(multiple_chromasomes_fasta)
+        outfile = d / "test.csv"
+        args = ["-i", infile, "-o", outfile, "-p", "NGG"]
+        gather.run(args)
+        assert outfile.read_text() == expected_csv_with_multiple_chromosomes
+
+
+class TestGather:
+    """Test the gather function"""
+    def test_with_ngg_pam(
+        self, tmp_path, single_chromosome_fasta, expected_csv_with_ngg_pam
+    ):
+        """Test that we can run the script with NGG PAM"""
+        d = tmp_path / "test"
+        d.mkdir()
+        infile = d / "test.fasta"
+        infile.write_text(single_chromosome_fasta)
+        outfile = d / "test.csv"
+        gather.gather(
+            inputfile=infile,
+            outputfile=outfile,
+            pam="NGG",
+            verbose=False,
+        )
+        assert outfile.read_text() == expected_csv_with_ngg_pam
+
+    def test_with_ngn_pam(
+        self, tmp_path, single_chromosome_fasta, expected_csv_with_ngn_pam
+    ):
+        """Test that we can run the script with NGN PAM"""
+        d = tmp_path / "test"
+        d.mkdir()
+        infile = d / "test.fasta"
+        infile.write_text(single_chromosome_fasta)
+        outfile = d / "test.csv"
+        gather.gather(
+            inputfile=infile,
+            outputfile=outfile,
+            pam="NGN",
+            verbose=False,
+        )
+        assert outfile.read_text() == expected_csv_with_ngn_pam
+
+    def test_with_multiple_chromosomes(
+        self,
+        tmp_path,
+        multiple_chromasomes_fasta,
+        expected_csv_with_multiple_chromosomes,
+    ):
+        """Test that we can run the script with multiple chromosomes"""
+        d = tmp_path / "test"
+        d.mkdir()
+        infile = d / "test.fasta"
+        infile.write_text(multiple_chromasomes_fasta)
+        outfile = d / "test.csv"
+        gather.gather(
+            inputfile=infile,
+            outputfile=outfile,
+            pam="NGG",
+            verbose=False,
+        )
+        assert outfile.read_text() == expected_csv_with_multiple_chromosomes

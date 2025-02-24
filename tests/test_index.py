@@ -61,24 +61,6 @@ class TestParseRecord:
             )
 
 
-class TestSequenceToBinaryEnconding:
-    def test_with_pam_right_true(self):
-        assert index.sequence_to_binary_encoding(
-            sequence="ACGT", pam_right=1
-        ) == np.uint64(0b100011011)
-
-    def test_with_pam_right_false(self):
-        assert index.sequence_to_binary_encoding(
-            sequence="ACGT", pam_right=0
-        ) == np.uint64(0b11011)
-
-    def test_with_error_flag(self):
-        assert (
-            index.sequence_to_binary_encoding(sequence="ACGN", pam_right=0)
-            == index.ERROR_STR
-        )
-
-
 @pytest.fixture
 def expected_binary_output():
     return struct.pack(
