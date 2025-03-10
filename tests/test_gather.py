@@ -225,6 +225,7 @@ X,27,GTTAATTAATTAATGCTTGTAGG,1,1
 
 class TestRun:
     """Test the command line run function"""
+
     def test_with_ngg_pam(
         self, tmp_path, single_chromosome_fasta, expected_csv_with_ngg_pam
     ):
@@ -270,6 +271,7 @@ class TestRun:
 
 class TestGather:
     """Test the gather function"""
+
     def test_with_ngg_pam(
         self, tmp_path, single_chromosome_fasta, expected_csv_with_ngg_pam
     ):
