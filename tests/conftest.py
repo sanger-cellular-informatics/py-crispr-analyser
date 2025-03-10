@@ -2782,4 +2782,4 @@ def guides_file(tmp_path):
 
 @pytest.fixture
 def get_guide_list():
-    return [d["encoded_guide"] for d in DATA]
+    return np.array([d["encoded_guide"] for d in DATA], dtype=np.uint64)
