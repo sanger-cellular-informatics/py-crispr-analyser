@@ -29,7 +29,7 @@ def find_off_targets(
     """Find off-targets for a given query sequence using CPU
 
     Args:
-        guides: The array of guide sequences
+        guides: The array of encoded gRNA sequences
         query_sequence: The query sequence
         reverse_query_sequence: The reverse complement of the query sequence
         offset: The offset of the guides default 0
@@ -88,7 +88,7 @@ def reverse_complement_binary(sequence: np.uint64, size: int) -> np.uint64:
 
 
 def print_off_targets(
-    guide_id: np.uint64,
+    crispr_id: np.uint64,
     summary: np.ndarray,
     off_target_ids: np.ndarray,
     species_id: np.uint8,
@@ -96,8 +96,9 @@ def print_off_targets(
     """Print the off targets to the console
 
     Args:
+        crispr_id: The id of the CRISPR
         summary: The summary of the off targets
-        off_target_ids: The off target ids
+        off_target_ids: The off target CRISPR ids
         species_id: The species id
     """
     summary_output = ", ".join(
@@ -105,10 +106,10 @@ def print_off_targets(
     )
 
     if len(off_target_ids) > 2000:
-        print(f"{guide_id}\t{species_id}\t{summary_output}")
+        print(f"{crispr_id}\t{species_id}\t{{{summary_output}}}")
     else:
         print(
-            f"{guide_id}\t{species_id}\t"
+            f"{crispr_id}\t{species_id}\t"
             f"{{{",".join(map(str, off_target_ids))}}}\t{{{summary_output}}}"
         )
 
@@ -121,6 +122,7 @@ def run(argv=sys.argv[1:]) -> None:
             """Usage: poetry run align [options...] [ids...]
 -h, --help            Print this help message
 -i, --ifile <file>    The input binary guides file
+[ids...]              The ids of the CRISPRs to find off-targets for
 """
         )
 
@@ -143,20 +145,20 @@ def run(argv=sys.argv[1:]) -> None:
             sys.exit()
         elif opt in ("-i", "--ifile"):
             inputfile = arg
-    if inputfile == "":
+    if inputfile == "" or len(args) == 0:
         usage()
         sys.exit(2)
 
     with open(inputfile, "rb") as in_file:
         check_file_header(in_file.read(HEADER_SIZE))
-        print(f"Version is {FILE_VERSION}")
+        print(f"Version is {FILE_VERSION}", file=sys.stderr)
         metadata = get_file_metadata(in_file.read(METADATA_SIZE))
         print_metadata(metadata)
         guides = get_guides(in_file, verbose=True)
 
-        print("Searching for off targets")
+        print("Searching for off targets", file=sys.stderr)
         for i in range(len(args)):
-            print(f"Finding off targets for {args[i]}")
+            print(f"Finding off targets for {args[i]}", file=sys.stderr)
             query_sequence = guides[int(args[i]) - 1]
             reverse_query_sequence = reverse_complement_binary(
                 query_sequence, 20
