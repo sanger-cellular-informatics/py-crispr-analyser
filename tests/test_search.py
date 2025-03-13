@@ -123,8 +123,8 @@ class TestRun:
         ]
         search.run(args)
         captured = capsys.readouterr()
-        assert "Found 2 exact matches" in captured.out
-        assert "Found the following matches:\n\t89\n\t91" in captured.out
+        assert "Found 2 exact matches" in captured.err
+        assert "\t89\n\t91" in captured.out
 
     def test_no_sequences_are_found(self, guides_with_no_matches_file, capsys):
         args = [
@@ -135,4 +135,4 @@ class TestRun:
         ]
         search.run(args)
         captured = capsys.readouterr()
-        assert "Found 0 exact matches" in captured.out
+        assert "Found 0 exact matches" in captured.err

@@ -81,18 +81,18 @@ def run(argv=sys.argv[1:]) -> None:
 
     with open(inputfile, "rb") as in_file:
         check_file_header(in_file.read(HEADER_SIZE))
-        print(f"Version is {FILE_VERSION}")
+        print(f"Version is {FILE_VERSION}", file=sys.stderr)
         metadata = get_file_metadata(in_file.read(METADATA_SIZE))
         print_metadata(metadata)
         guides = get_guides(in_file, verbose=True)
-        print(f"Loaded {guides.size} sequences")
+        print(f"Loaded {guides.size} sequences", file=sys.stderr)
         indices = search(
             guides=guides,
             sequence=sequence,
             verbose=True,
         )
-        print(f"Found {len(indices)} exact matches")
-        print("Found the following matches:")
+        print(f"Found {len(indices)} exact matches", file=sys.stderr)
+        print("Found the following matches:", file=sys.stderr)
         for idx in indices:
             print(f"\t{idx + metadata.offset}")
 
