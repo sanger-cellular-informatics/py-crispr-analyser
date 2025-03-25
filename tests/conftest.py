@@ -2762,14 +2762,20 @@ def guides_file(tmp_path):
             np.uint8(1),
             # file version
             np.uint(3),
-            # metadata
+            # METADATA
+            # - number of guides
             np.uint64(f"{len(DATA)}"),
+            # - length of the guides
             np.uint64(20),
+            # - offset
             np.uint64(0),
+            # - species ID
             np.uint8(1),
+            # - Species name
             b"Human",
+            # - Genome assembly
             b"GRCh38",
-            # padding
+            # - padding
             np.uint8(0),
             np.uint8(0),
             np.uint8(0),
@@ -2781,5 +2787,5 @@ def guides_file(tmp_path):
 
 
 @pytest.fixture
-def get_guide_list():
+def guide_list():
     return np.array([d["encoded_guide"] for d in DATA], dtype=np.uint64)
