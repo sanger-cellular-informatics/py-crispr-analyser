@@ -12,9 +12,10 @@ testing:
   image: python:3.12-bookworm
   stage: test
   script:
-    - pip install poetry
-    - poetry install
-    - poetry run pytest
+    - curl -fsSL https://pixi.sh/install.sh | bash
+    - source ~/.bashrc
+    - pixi install
+    - pixi run pytest
 
 sast:
   stage: test

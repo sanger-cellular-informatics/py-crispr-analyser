@@ -1,4 +1,5 @@
 import numpy as np
+from numba import cuda
 import pytest
 import py_crispr_analyser.align as align
 
@@ -15,13 +16,9 @@ def reverse_query_sequence():
     return np.uint64(0b1000100000010100101111110101001011111111)
 
 
-def test_find_off_targets(
-    get_guide_list, query_sequence, reverse_query_sequence
-):
-    """Find_off_targets. The expected output has been calculated using
-    https://github.com/htgt/crispacuda and
-    https://github.com/htgt/CRISPR-Analyser."""
-    expected_guides = [
+@pytest.fixture
+def expected_guides():
+    return [
         2,
         3,
         4,
@@ -412,11 +409,56 @@ def test_find_off_targets(
         390,
         391,
     ]
+
+
+def test_find_off_targets(
+    guide_list, query_sequence, reverse_query_sequence, expected_guides
+):
+    """The expected output using CPU based on output from:
+    https://github.com/htgt/crispacuda and
+    https://github.com/htgt/CRISPR-Analyser."""
     summary, off_target_ids = align.find_off_targets(
-        get_guide_list, query_sequence, reverse_query_sequence, 0
+        guide_list, query_sequence, reverse_query_sequence, 0
     )
     assert summary == [2, 0, 1, 36, 350]
     assert off_target_ids == expected_guides
+
+
+@pytest.mark.skipif(
+    cuda.is_available() is False, reason="CUDA is not available"
+)
+def test_find_off_targets_kernel(
+    guide_list, query_sequence, reverse_query_sequence, expected_guides
+):
+    """The expected output using GPU based on output from:
+    https://github.com/htgt/crispacuda and
+    https://github.com/htgt/CRISPR-Analyser."""
+    threads_per_block = 32
+    blocks_per_grid = 392
+    device_guides = cuda.to_device(guide_list)
+    summary = np.zeros(5, dtype=np.uint32)
+    off_target_ids_idx = np.zeros(1, dtype=np.uint32)
+    off_target_ids = np.zeros(2000, dtype=np.uint32)
+    device_summary = cuda.to_device(summary)
+    device_off_target_ids_idx = cuda.to_device(off_target_ids_idx)
+    device_off_target_ids = cuda.to_device(off_target_ids)
+    align.find_off_targets_kernel[blocks_per_grid, threads_per_block](
+        device_guides,
+        query_sequence,
+        reverse_query_sequence,
+        device_summary,
+        device_off_target_ids_idx,
+        device_off_target_ids,
+        0,
+    )
+    host_summary = device_summary.copy_to_host()
+    host_off_target_ids = np.trim_zeros(device_off_target_ids.copy_to_host())
+    np.testing.assert_array_equal(
+        host_summary, np.array([2, 0, 1, 36, 350], dtype=np.uint32)
+    )
+    np.testing.assert_array_equal(
+        np.sort(host_off_target_ids), np.array(expected_guides, dtype=np.uint32)
+    )
 
 
 def test_pop_count(query_sequence):

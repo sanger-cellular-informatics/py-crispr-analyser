@@ -11,6 +11,8 @@ The following workflow is supported:
 - **Searching** for CRISPRs by using a gRNA sequence,
 - **Aligning** the gRNA sequence to the CRISPRs to find off-targets.
 
+Furthermore library functions can be used directly in a users own code to perform the above tasks.
+
 ## Installation
 
 To install the Python CRISPR Analyser, first clone the repository:
@@ -19,17 +21,12 @@ To install the Python CRISPR Analyser, first clone the repository:
 git clone git@gitlab.internal.sanger.ac.uk:sci/py-crispr-analyser.git
 ```
 
-Make sure you have Python 3.10 or later and install [Poetry](https://python-poetry.org/):
-
-```bash
-pip install poetry
-
-```
+Make sure you have Python 3.10 or later and install [Pixi](https://pixi.sh/latest/#installation). After following the installation instructions you may need to restart your shell.
 
 Then install the dependencies:
 
 ```bash
-poetry install
+pixi install
 ```
 
 ## Usage
@@ -41,7 +38,7 @@ Python CRISPR Analyser can be used either as a library or run as a series of scr
 To run the **Gather** command:
 
 ```bash
-poetry run gather -i <input_fasta> -o <output_file> -p <pam_sequence>
+pixi run gather -i <input_fasta> -o <output_file> -p <pam_sequence>
 ```
 
 The parameters are:
@@ -53,7 +50,7 @@ The parameters are:
 For example:
 
 ```bash
-poetry run gather -i Homo_sapiens.GRCh38.dna.chromosome.18.fa -o chromosome.18.csv -p "NGG"
+pixi run gather -i Homo_sapiens.GRCh38.dna.chromosome.18.fa -o chromosome.18.csv -p "NGG"
 ```
 
 ### Index
@@ -61,7 +58,7 @@ poetry run gather -i Homo_sapiens.GRCh38.dna.chromosome.18.fa -o chromosome.18.c
 To run the **Index** command:
 
 ```bash
-poetry run index -i <input_csv> -a <assembly> -o <offset> -o <output_bin> -s <species> -e <species_id> -g <guide_length> -p <pam_length>
+pixi run index -i <input_csv> -a <assembly> -o <offset> -o <output_bin> -s <species> -e <species_id> -g <guide_length> -p <pam_length>
 ```
 
 The parameters are:
@@ -78,7 +75,7 @@ The parameters are:
 for example:
 
 ```bash
-poetry run index -i chromosome.1.csv -i chromosome.2.csv -o guides.bin -a GRCh38 -s Human
+pixi run index -i chromosome.1.csv -i chromosome.2.csv -o guides.bin -a GRCh38 -s Human
 ```
 
 The CSV input file must have the following fields:
@@ -95,7 +92,7 @@ Note that *Species ID* is a legacy field and is not used in the current version 
 Run the **Search** command as follows:
 
 ```bash
-poetry run search -i <input_bin> -s <gRNA_sequence>
+pixi run search -i <input_bin> -s <gRNA_sequence>
 ```
 
 The parameters are:
@@ -131,11 +128,12 @@ And the CRISPR IDS found would be printed to STDOUT, separated by newlines:
 We can calculate the summary of off-targets for one or more CRISPRs given their ID and using the **Align** command as follows:
 
 ```bash
-poetry run align -i <input_bin> [ids]
+pixi run align -i <input_bin> [ids]
 ```
 
 The parameters are:
 - -i, --ifile - The Input binary guides file - *Required*
+- --no-cuda - Disable CUDA GPU acceleration
 - [ids] - one or more IDs of the CRISPRs to search for off-targets - *Required*
 
 As with the **Search** command, the output is split between STDERR and STDOUT. The summary of the search is printed to STDERR and the off-targets are printed to STDOUT.
@@ -166,10 +164,18 @@ For example:
 
 Note that any CRISPRs with more than 2000 off-targets will not have the off-target CRISPR IDs printer to STDOUT as shown in the second CRISPR above.
 
+### GPU Acceleration
+
+The **Align** command will run on GPUs if it detects a compatible Nvidia GPU. To disable GPU acceleration use the *--no-cuda* flag. This software supports CUDA 12 but depending on the minor version of CUDA you may need to run the **Align** command with the *NUMBA_CUDA_ENABLE_PYNVJITLINK=1* environmental variable. For example:
+
+```bash
+NUMBA_CUDA_ENABLE_PYNVJITLINK=1 pixi run align -i grch38_ngg.bin 23322 44343
+```
+
 ## Testing
 
 To run the unit tests:
 
 ```bash
-poetry run pytest
+pixi run pytest
 ```
