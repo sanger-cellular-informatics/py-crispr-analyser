@@ -1,3 +1,5 @@
+# Copyright (C) 2025 Genome Research Ltd.
+
 import pytest
 import py_crispr_analyser.gather as gather
 
@@ -9,13 +11,13 @@ class TestMatchPam:
             gather.match_pam(
                 dna_sequence="ATCGA", pam_sequence="GN", pam_on_right=True
             )
-            == True
+            is True
         )
         assert (
             gather.match_pam(
                 dna_sequence="ATCGA", pam_sequence="AN", pam_on_right=True
             )
-            == False
+            is False
         )
 
     def test_pam_on_right(self):
@@ -24,61 +26,63 @@ class TestMatchPam:
             gather.match_pam(
                 dna_sequence="ATCGA", pam_sequence="GN", pam_on_right=True
             )
-            == True
+            is True
         )
         assert (
             gather.match_pam(
                 dna_sequence="ATCGA", pam_sequence="AT", pam_on_right=True
             )
-            == False
+            is False
         )
         assert (
             gather.match_pam(
                 dna_sequence="ATCGA", pam_sequence="GA", pam_on_right=True
             )
-            == True
+            is True
         )
 
     def test_pam_on_left(self):
-        """Test that matching is done on the left PAM sequence reverse_complement"""
+        """Test that matching is done on the left PAM sequence
+        with reverse_complement"""
         assert (
             gather.match_pam(
                 dna_sequence="ATCGA", pam_sequence="GN", pam_on_right=False
             )
-            == False
+            is False
         )
         assert (
             gather.match_pam(
                 dna_sequence="ATCGA", pam_sequence="GN", pam_on_right=False
             )
-            == False
+            is False
         )
         assert (
             gather.match_pam(
                 dna_sequence="ATCGA", pam_sequence="AT", pam_on_right=False
             )
-            == True
+            is True
         )
 
     def test_non_ACGT_character_in_dna_sequence(self):
-        """Test that we don't support non-ACGT characters in the the PAM sequence"""
+        """Test that we don't support non-ACGT characters in
+        the PAM sequence"""
         assert (
             gather.match_pam(
                 dna_sequence="ATCAN", pam_sequence="AN", pam_on_right=True
             )
-            == False
+            is False
         )
         assert (
             gather.match_pam(
                 dna_sequence="NTCGA", pam_sequence="AN", pam_on_right=False
             )
-            == False
+            is False
         )
         assert (
             gather.match_pam(
                 dna_sequence="ATNGA", pam_sequence="AN", pam_on_right=False
             )
-            == True
+            is True
         )
 
 
