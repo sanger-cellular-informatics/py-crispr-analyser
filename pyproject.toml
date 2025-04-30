@@ -1,3 +1,5 @@
+# Copyright (C) 2025 Genome Research Ltd.
+
 [project]
 name = "py-crispr-analyser"
 description = "A Python package for analysing the genome for CRISPRs and off-targets"

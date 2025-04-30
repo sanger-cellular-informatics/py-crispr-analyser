@@ -13,6 +13,10 @@ The following workflow is supported:
 
 Furthermore library functions can be used directly in a users own code to perform the above tasks.
 
+## Copyright
+
+Copyright (C) 2025 Genome Research Ltd.
+
 ## Installation
 
 To install the Python CRISPR Analyser, first clone the repository:

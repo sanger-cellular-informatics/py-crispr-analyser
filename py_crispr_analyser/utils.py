@@ -1,3 +1,5 @@
+# Copyright (C) 2025 Genome Research Ltd.
+
 from dataclasses import dataclass
 import numpy as np
 import struct
@@ -47,7 +49,9 @@ def get_guides(
     if number_of_guides != guides.size:
         raise ValueError("Invalid number of guides")
     if verbose:
-        print(f"Loading took {time.time() - start:.2f} seconds", file=sys.stderr)
+        print(
+            f"Loading took {time.time() - start:.2f} seconds", file=sys.stderr
+        )
     return guides
 
 

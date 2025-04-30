@@ -1,3 +1,5 @@
+# Copyright (C) 2025 Genome Research Ltd.
+
 import collections
 import csv
 import getopt
@@ -8,6 +10,7 @@ import time
 from .utils import reverse_complement
 
 GUIDE_RNA_LENGTH = 20
+
 
 def match_pam(
     dna_sequence: str,

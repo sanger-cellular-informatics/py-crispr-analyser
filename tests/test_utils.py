@@ -1,3 +1,5 @@
+# Copyright (C) 2025 Genome Research Ltd.
+
 import numpy as np
 import pytest
 import struct

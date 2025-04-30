@@ -1,3 +1,5 @@
+# Copyright (C) 2025 Genome Research Ltd.
+
 import getopt
 import numpy as np
 import struct
@@ -5,8 +7,6 @@ import sys
 import time
 
 from .utils import (
-    COMPLEMENT_MAP,
-    ERROR_STR,
     FILE_VERSION,
     sequence_to_binary_encoding,
 )
