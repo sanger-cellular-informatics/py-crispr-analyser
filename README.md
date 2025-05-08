@@ -13,6 +13,12 @@ The following workflow is supported:
 
 Furthermore library functions can be used directly in a users own code to perform the above tasks.
 
+If you use the code in any scientific work please cite:
+
+```
+Bin Shen, Wensheng Zhang, Jun Zhang, Jiankui Zhou, Jianying Wang, Li Chen, Lu Wang, Alex Hodgkins, Vivek Iyer, Xingxu Huang & William C Skarnes (2014) Efficient genome modification by CRISPR-Cas9 nickase with minimal off-target effects. doi:10.1038/nmeth.2857
+```
+
 ## Copyright
 
 Copyright (C) 2025 Genome Research Ltd.
