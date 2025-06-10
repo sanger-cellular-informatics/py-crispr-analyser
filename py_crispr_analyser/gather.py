@@ -38,7 +38,13 @@ def match_pam(
     return True
 
 
-def gather(inputfile: str, outputfile: str, pam: str, verbose: bool = False):
+def gather(
+    inputfile: str,
+    outputfile: str,
+    pam: str,
+    verbose: bool = False,
+    legacy_mode: bool = False,
+):
     """Run the CRISPR gatherer.
 
     Args:
@@ -47,6 +53,8 @@ def gather(inputfile: str, outputfile: str, pam: str, verbose: bool = False):
         pam: The string PAM sequence to search for.
         verbose: A boolean indicating if verbose output is enabled.
             Default is False.
+        legacy_mode: A boolean indicating that species ID column
+            is added to CSV file (always equalling 1)
     """
     if verbose:
         start = time.time()
@@ -82,18 +90,24 @@ def gather(inputfile: str, outputfile: str, pam: str, verbose: bool = False):
                             pam_sequence=reverse_complement(pam),
                             pam_on_right=False,
                         ):
-                            csvwriter.writerow(
+                            output = (
                                 [chromosome, position, "".join(buffer), 0, 1]
+                                if legacy_mode
+                                else [chromosome, position, "".join(buffer), 0]
                             )
+                            csvwriter.writerow(output)
                             crispr_count += 1
                         if match_pam(
                             dna_sequence=buffer,
                             pam_sequence=pam,
                             pam_on_right=True,
                         ):
-                            csvwriter.writerow(
+                            output = (
                                 [chromosome, position, "".join(buffer), 1, 1]
+                                if legacy_mode
+                                else [chromosome, position, "".join(buffer), 1]
                             )
+                            csvwriter.writerow(output)
                             crispr_count += 1
     if verbose:
         end = time.time()
@@ -141,7 +155,7 @@ def run(argv=sys.argv[1:]):
         usage()
         sys.exit(2)
 
-    gather(inputfile, outputfile, pam, verbose=True)
+    gather(inputfile, outputfile, pam, verbose=True, legacy_mode=True)
 
 
 if __name__ == "__main__":
