@@ -2,15 +2,47 @@
 
 [project]
 name = "py-crispr-analyser"
-description = "A Python package for analysing the genome for CRISPRs and off-targets"
+description = "A Python package for analysing a genome for CRISPRs and off-targets"
 version = "0.1.0"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 readme = "README.md"
 authors = [
   {name = "Bo Fussing", email = "bf15@sanger.ac.uk"},
 ]
-requires-python = ">=3.13"
-dependencies = []
+requires-python = ">=3.12"
+dependencies = [
+  "numba>=0.61.2,<0.62",
+  "numpy>=2.0,<2.3",
+  "pynvjitlink-cu12>=0.7.0,<0.8; sys_platform == 'linux'",
+  "nvidia-cuda-nvcc-cu12>=12.9.86,<13; sys_platform == 'linux'",
+  "nvidia-cuda-nvrtc-cu12>=12.9.86,<13; sys_platform == 'linux'",
+]
+optional-dependencies.dev = [
+  "black>=25.1.0,<26",
+  "flake8>=7.1.2,<8",
+  "pytest>=8.3.5,<9",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.scripts]
+crispr_analyser_align = "py_crispr_analyser.align:run"
+crispr_analyser_gather = "py_crispr_analyser.gather:run"
+crispr_analyser_index = "py_crispr_analyser.index:run"
+crispr_analyser_search = "py_crispr_analyser.search:run"
+
+[project.urls]
+Repository = "https://github.com/htgt/py-crispr-analyser"
+Issues = "https://github.com/htgt/py-crispr-analyser/issues"
 
 [tool.pixi.project]
 channels = ["conda-forge", "rapidsai"]

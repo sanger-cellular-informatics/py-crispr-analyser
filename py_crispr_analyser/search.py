@@ -48,7 +48,7 @@ def run(argv=sys.argv[1:]) -> None:
 
     def usage() -> None:
         print(
-            """Usage: poetry run search [options...]
+            """Usage: crispr_analyser_search [options...]
 -h, --help            Print this help message
 -i, --ifile <file>    The input binary guides file
 -s, --sequence <str>  The guide sequence to search for
@@ -97,7 +97,3 @@ def run(argv=sys.argv[1:]) -> None:
         print("Found the following matches:", file=sys.stderr)
         for idx in indices:
             print(f"\t{idx + metadata.offset}")
-
-
-if __name__ == "__main__":
-    run()

@@ -122,7 +122,7 @@ def run(argv=sys.argv[1:]):
 
     def usage():
         print(
-            """Usage: poetry run gather [options...]
+            """Usage: crispr_analyser_gather [options...]
 -h, --help           Print this help message
 -i, --ifile <file>   The input FASTA file
 -o, --ofile <file>   The output file
@@ -156,7 +156,3 @@ def run(argv=sys.argv[1:]):
         sys.exit(2)
 
     gather(inputfile, outputfile, pam, verbose=True, legacy_mode=True)
-
-
-if __name__ == "__main__":
-    run()
