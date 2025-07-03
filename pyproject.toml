@@ -44,29 +44,6 @@ crispr_analyser_search = "py_crispr_analyser.search:run"
 Repository = "https://github.com/htgt/py-crispr-analyser"
 Issues = "https://github.com/htgt/py-crispr-analyser/issues"
 
-[tool.pixi.project]
-channels = ["conda-forge", "rapidsai"]
-platforms = ["linux-64", "osx-arm64"]
-
-[tool.pixi.dependencies]
-black = ">=25.1.0,<26"
-flake8 = ">=7.1.2,<8"
-pytest = ">=8.3.5,<9"
-numba-cuda = ">=0.8.0,<0.9"
-numba = "==0.61.2"
-numpy = ">=2.0,<2.2"
-
-[tool.pixi.tasks]
-align = "python -m py_crispr_analyser.align"
-gather = "python -m py_crispr_analyser.gather"
-index = "python -m py_crispr_analyser.index"
-search = "python -m py_crispr_analyser.search"
-
-[tool.pixi.target.linux-64.dependencies]
-pynvjitlink = ">=0.5.2,<0.6"
-cuda-nvcc = ">=12.8.93,<13"
-cuda-nvrtc = ">=12.8.93,<13"
-
 [system-requirements]
 cuda = ">=12.0"
 
