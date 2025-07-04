@@ -12,10 +12,9 @@ testing:
   image: python:3.12-bookworm
   stage: test
   script:
-    - curl -fsSL https://pixi.sh/install.sh | bash
-    - source ~/.bashrc
-    - pixi install
-    - pixi run pytest
+    - pip install .
+    - pip install '.[dev]'
+    - pytest tests
 
 sast:
   stage: test
