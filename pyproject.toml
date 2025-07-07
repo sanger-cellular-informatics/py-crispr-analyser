@@ -1,9 +1,13 @@
 # Copyright (C) 2025 Genome Research Ltd.
 
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
 [project]
 name = "py-crispr-analyser"
-description = "A Python package for analysing a genome for CRISPRs and off-targets"
-version = "0.1.0"
+description = "Analyse a genome for CRISPRs and off-targets"
+version = "1.0.0"
 license = "MIT"
 license-files = ["LICENSE"]
 readme = "README.md"
@@ -14,9 +18,7 @@ requires-python = ">=3.12"
 dependencies = [
   "numba>=0.61.2,<0.62",
   "numpy>=2.0,<2.3",
-  "pynvjitlink-cu12>=0.7.0,<0.8; sys_platform == 'linux'",
-  "nvidia-cuda-nvcc-cu12>=12.9.86,<13; sys_platform == 'linux'",
-  "nvidia-cuda-nvrtc-cu12>=12.9.86,<13; sys_platform == 'linux'",
+  "numba-cuda[cu12]; sys_platform == 'linux'",
 ]
 optional-dependencies.dev = [
   "black>=25.1.0,<26",
@@ -29,7 +31,8 @@ classifiers = [
   "License :: OSI Approved :: MIT License",
   "Operating System :: MacOS",
   "Operating System :: POSIX :: Linux",
-  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
   "Topic :: Scientific/Engineering :: Bio-Informatics",
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]
@@ -44,13 +47,6 @@ crispr_analyser_search = "py_crispr_analyser.search:run"
 Repository = "https://github.com/htgt/py-crispr-analyser"
 Issues = "https://github.com/htgt/py-crispr-analyser/issues"
 
-[system-requirements]
-cuda = ">=12.0"
-
-[build-system]
-build-backend = "hatchling.build"
-requires = ["hatchling"]
-
 [tool.black]
 line-length = 80
-target-version = ['py313']
+target-version = ["py312"]
