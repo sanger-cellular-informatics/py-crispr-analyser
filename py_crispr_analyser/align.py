@@ -158,12 +158,13 @@ def print_off_targets(
 
 
 def run(argv=sys.argv[1:]) -> None:
+    """Run the align command to find off-targets for CRISPRs"""
     inputfile = ""
     use_cuda = True
 
     def usage() -> None:
         print(
-            """Usage: poetry run align [options...] [ids...]
+            """Usage: crispr_analyser_align [options...] [ids...]
 -h, --help            Print this help message
 -i, --ifile <file>    The input binary guides file
 --no-cuda             Do not use CUDA GPU acceleration
@@ -262,7 +263,3 @@ def run(argv=sys.argv[1:]) -> None:
                 print_off_targets(
                     args[i], summary, off_target_ids, metadata.species_id
                 )
-
-
-if __name__ == "__main__":
-    run()

@@ -165,7 +165,7 @@ def run(argv=sys.argv[1:]):
 
     def usage():
         print(
-            """Usage: poetry run index [options...]
+            """Usage: crispr_analyser_index [options...]
 -a, --assembly <name>         The assembly name
 -e, --species_id <integer>    The species ID
 -f, --offset <integer>        The offset to start numbering from
@@ -237,7 +237,3 @@ def run(argv=sys.argv[1:]):
         pam_length,
         verbose=True,
     )
-
-
-if __name__ == "__main__":
-    run()

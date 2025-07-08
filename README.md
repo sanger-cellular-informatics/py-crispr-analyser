@@ -19,36 +19,38 @@ If you use the code in any scientific work please cite:
 Bin Shen, Wensheng Zhang, Jun Zhang, Jiankui Zhou, Jianying Wang, Li Chen, Lu Wang, Alex Hodgkins, Vivek Iyer, Xingxu Huang & William C Skarnes (2014) Efficient genome modification by CRISPR-Cas9 nickase with minimal off-target effects. doi:10.1038/nmeth.2857
 ```
 
-## Copyright
+## Prerequisites
 
-Copyright (C) 2025 Genome Research Ltd.
+The Python CRISPR Analyser requires Python 3.12 or later. If using the database functionality you should have SQLite3 installed. If using CUDA, you will need to have a compatible Nvidia GPU and the CUDA kernel drivers installed, we have testing with CUDA 12.4.
 
 ## Installation
 
-To install the Python CRISPR Analyser, first clone the repository:
+To install the Python CRISPR Analyser:
+
+The easiest approach is to install using Pip
 
 ```bash
-git clone git@gitlab.internal.sanger.ac.uk:sci/py-crispr-analyser.git
+pip install py-crispr-analyser
 ```
 
-Make sure you have Python 3.10 or later and install [Pixi](https://pixi.sh/latest/#installation). After following the installation instructions you may need to restart your shell.
-
-Then install the dependencies:
+Alternatively the source code can be downloaded from Github:
 
 ```bash
-pixi install
+git clone git@github.com:htgt/py-crispr-analyser.git
 ```
+
+Make sure you have Python 3.12 or later.
 
 ## Usage
 
-Python CRISPR Analyser can be used either as a library or run as a series of scritps.
+If Python CRISPR Analyser is installed using pip, then the command line tools are available as follows:
 
 ### Gather
 
 To run the **Gather** command:
 
 ```bash
-pixi run gather -i <input_fasta> -o <output_file> -p <pam_sequence>
+crispr_analyser_gather -i <input_fasta> -o <output_file> -p <pam_sequence>
 ```
 
 The parameters are:
@@ -60,7 +62,7 @@ The parameters are:
 For example:
 
 ```bash
-pixi run gather -i Homo_sapiens.GRCh38.dna.chromosome.18.fa -o chromosome.18.csv -p "NGG"
+crispr_analyser_gather -i Homo_sapiens.GRCh38.dna.chromosome.18.fa -o chromosome.18.csv -p "NGG"
 ```
 
 ### Index
@@ -68,7 +70,7 @@ pixi run gather -i Homo_sapiens.GRCh38.dna.chromosome.18.fa -o chromosome.18.csv
 To run the **Index** command:
 
 ```bash
-pixi run index -i <input_csv> -a <assembly> -o <offset> -o <output_bin> -s <species> -e <species_id> -g <guide_length> -p <pam_length>
+crispr_analyser_index -i <input_csv> -a <assembly> -o <offset> -o <output_bin> -s <species> -e <species_id> -g <guide_length> -p <pam_length>
 ```
 
 The parameters are:
@@ -85,7 +87,7 @@ The parameters are:
 for example:
 
 ```bash
-pixi run index -i chromosome.1.csv -i chromosome.2.csv -o guides.bin -a GRCh38 -s Human
+crispr_analyser_index -i chromosome.1.csv -i chromosome.2.csv -o guides.bin -a GRCh38 -s Human
 ```
 
 The CSV input file must have the following fields:
@@ -102,7 +104,7 @@ Note that *Species ID* is a legacy field and is not used in the current version 
 Run the **Search** command as follows:
 
 ```bash
-pixi run search -i <input_bin> -s <gRNA_sequence>
+crispr_analyser_search -i <input_bin> -s <gRNA_sequence>
 ```
 
 The parameters are:
@@ -138,7 +140,7 @@ And the CRISPR IDS found would be printed to STDOUT, separated by newlines:
 We can calculate the summary of off-targets for one or more CRISPRs given their ID and using the **Align** command as follows:
 
 ```bash
-pixi run align -i <input_bin> [ids]
+crispr_analyser_align -i <input_bin> [ids]
 ```
 
 The parameters are:
@@ -176,10 +178,10 @@ Note that any CRISPRs with more than 2000 off-targets will not have the off-targ
 
 ### GPU Acceleration
 
-The **Align** command will run on GPUs if it detects a compatible Nvidia GPU. To disable GPU acceleration use the *--no-cuda* flag. This software supports CUDA 12 but depending on the minor version of CUDA you may need to run the **Align** command with the *NUMBA_CUDA_ENABLE_PYNVJITLINK=1* environmental variable. For example:
+The **Align** command will run on GPUs if it detects a compatible Nvidia GPU. Note that CUDA libraries are only installed on Linux. To disable GPU acceleration use the *--no-cuda* flag. This software supports CUDA 12 but depending on the minor version of CUDA you may need to run the **Align** command with the *NUMBA_CUDA_ENABLE_PYNVJITLINK=1* environmental variable. For example:
 
 ```bash
-NUMBA_CUDA_ENABLE_PYNVJITLINK=1 pixi run align -i grch38_ngg.bin 23322 44343
+NUMBA_CUDA_ENABLE_PYNVJITLINK=1 crispr_analyser_align -i grch38_ngg.bin 23322 44343
 ```
 
 ## Cross Referencing Guides to CRISPRs
@@ -208,7 +210,7 @@ CREATE TABLE crisprs (
 We include a script to automate this for you using SQLite3:
 
 ```bash
-pixi run python scripts/index_database.py -d crispr.db \
+python scripts/index_database.py -d crispr.db \
   -i chromosome.1.csv \
   -i chromosome.2.csv \
   -i chromosome.3.csv \
@@ -221,8 +223,27 @@ Also note that the sequence with which the *-i* flag is used determines the orde
 
 ## Testing
 
+Make sure you have installed the source code and. Pytest need to be installed, this can be done using pip to install the development tools (which includes black, flake8 and pytest):
+
+```bash
+pip install '.[dev]'
+```
+
 To run the unit tests:
 
 ```bash
-pixi run pytest
+pytest tests
 ```
+
+## Copyright
+
+Copyright (C) 2025 Genome Research Ltd.
+
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## Contact
+
+[Cellular Informatics Team](https://www.sanger.ac.uk/group/cellular-informatics/) at the [Wellcome Sanger Institute](https://www.sanger.ac.uk/), Hinxton, UK - [wge@sanger.ac.uk](mailto:wge@sanger.ac.uk)
