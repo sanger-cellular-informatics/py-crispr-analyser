@@ -13,6 +13,12 @@ The following workflow is supported:
 
 Furthermore library functions can be used directly in a users own code to perform the above tasks.
 
+If you use the code in any scientific work please cite:
+
+```
+Bin Shen, Wensheng Zhang, Jun Zhang, Jiankui Zhou, Jianying Wang, Li Chen, Lu Wang, Alex Hodgkins, Vivek Iyer, Xingxu Huang & William C Skarnes (2014) Efficient genome modification by CRISPR-Cas9 nickase with minimal off-target effects. doi:10.1038/nmeth.2857
+```
+
 ## Prerequisites
 
 The Python CRISPR Analyser requires Python 3.12 or later. If using the database functionality you should have SQLite3 installed. If using CUDA, you will need to have a compatible Nvidia GPU and the CUDA kernel drivers installed, we have testing with CUDA 12.4.
@@ -232,6 +238,7 @@ pytest tests
 ## Copyright
 
 Copyright (C) 2025 Genome Research Ltd.
+
 
 ## License
 
