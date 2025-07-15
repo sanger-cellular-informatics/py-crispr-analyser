@@ -20,12 +20,12 @@ def match_pam(
 ) -> bool:
     """Check if the DNA sequence has a PAM sequence match.
 
-    Args:
-        dna_sequence: The string DNA sequence to check.
-        pam_sequence: The string PAM sequence to match.
-        pam_on_right: A boolean indicating if PAM sequence is on the right.
-        legacy_mode: A boolean indicating if non-ACGT chars allowed in PAM
-            region of the DNA sequence. Default is False.
+    :param dna_sequence: The string DNA sequence to check.
+    :param pam_sequence: The string PAM sequence to match.
+    :param pam_on_right: A boolean indicating if PAM sequence is on the right.
+    :param legacy_mode: A boolean indicating if non-ACGT chars allowed in PAM
+        region of the DNA sequence. Default is False.
+    :return: True if the PAM sequence matches, False otherwise.
     """
     start = len(dna_sequence) - len(pam_sequence) if pam_on_right else 0
     for i in range(len(pam_sequence)):
@@ -44,17 +44,17 @@ def gather(
     pam: str,
     verbose: bool = False,
     legacy_mode: bool = False,
-):
+) -> None:
     """Run the CRISPR gatherer.
 
-    Args:
-        inputfile: The input FASTA file.
-        outputfile: The output CSV file generated.
-        pam: The string PAM sequence to search for.
-        verbose: A boolean indicating if verbose output is enabled.
-            Default is False.
-        legacy_mode: A boolean indicating that species ID column
-            is added to CSV file (always equalling 1)
+    :param inputfile: The input FASTA file containing DNA sequences.
+    :param outputfile: The output CSV file to write results to.
+    :param pam: The string PAM sequence to search for e.g. "NGG".
+    :param verbose: A boolean indicating if verbose output is enabled.
+        Default is False.
+    :param legacy_mode: A boolean indicating that species ID column
+        is added to CSV file (always equalling 1). Default is False.
+    :return: None
     """
     if verbose:
         start = time.time()

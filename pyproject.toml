@@ -7,7 +7,7 @@ requires = ["hatchling"]
 [project]
 name = "py-crispr-analyser"
 description = "Analyse a genome for CRISPRs and off-targets"
-version = "1.0.0"
+version = "1.0.1"
 license = "MIT"
 license-files = ["LICENSE"]
 readme = "README.md"
@@ -19,11 +19,6 @@ dependencies = [
   "numba>=0.61.2,<0.62",
   "numpy>=2.0,<2.3",
   "numba-cuda[cu12]; sys_platform == 'linux'",
-]
-optional-dependencies.dev = [
-  "black>=25.1.0,<26",
-  "flake8>=7.1.2,<8",
-  "pytest>=8.3.5,<9",
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -37,6 +32,19 @@ classifiers = [
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
+[project.optional-dependencies]
+dev = [
+  "black>=25.1.0,<26",
+  "flake8>=7.1.2,<8",
+  "pytest>=8.3.5,<9",
+]
+sphinx = [
+  "myst-parser>=4.0.1,<5",
+  "sphinx>=8.2.3,<9",
+  "sphinx-rtd-theme>=3.0.2,<4",
+  "sphinx-pyproject>=0.3.0,<0.4",
+]
+
 [project.scripts]
 crispr_analyser_align = "py_crispr_analyser.align:run"
 crispr_analyser_gather = "py_crispr_analyser.gather:run"
@@ -46,6 +54,14 @@ crispr_analyser_search = "py_crispr_analyser.search:run"
 [project.urls]
 Repository = "https://github.com/htgt/py-crispr-analyser"
 Issues = "https://github.com/htgt/py-crispr-analyser/issues"
+
+[tool.sphinx-pyproject]
+copyright = "2025 Genome Research Ltd"
+project = "py-crispr-analyser"
+
+[tool.sphinx-pyproject.myst_substitutions]
+tested_cuda_version = "12.4"
+requires_python = ">=3.12"
 
 [tool.black]
 line-length = 80
