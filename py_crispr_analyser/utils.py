@@ -20,6 +20,8 @@ PADDING_FORMAT = "<BBB"
 
 @dataclass
 class Metadata:
+    """A dataclass to hold metadata information from the guides file.
+    """
     number_of_sequences: np.uint64
     sequence_length: np.uint64
     offset: np.uint64
@@ -31,11 +33,11 @@ class Metadata:
 def get_guides(
     guidesfile_handle: typing.BinaryIO, verbose: bool = False
 ) -> np.ndarray:
-    """Get the array of guides from the binary guides file
+    """Get array of guides from the binary guides file.
 
-    Args:
-        guidesfile_handle: The file handle of the guides file
-        verbose: A boolean to print verbose output
+    :param guidesfile_handle: The file handle of the guides file
+    :param verbose: A boolean to print verbose output
+    :return: A numpy array of guides
     """
     if verbose:
         start = time.time()
@@ -56,11 +58,11 @@ def get_guides(
 
 
 def sequence_to_binary_encoding(sequence: str, pam_right: int) -> np.uint64:
-    """Convert a string DNA sequence to bits accounting for pam right or left
+    """Convert a string DNA sequence to bits accounting for pam right or left.
 
-    Args:
-        sequence: The string DNA sequence to convert
-        pam_right: An integer indicating if PAM is on the right
+    :param sequence: The string DNA sequence to convert
+    :param pam_right: An integer indicating if PAM is on the right (1) or left (0)
+    :return: A 64-bit unsigned integer representing the sequence
     """
     bits = np.uint64(pam_right)
     for character in sequence:
@@ -76,17 +78,19 @@ def sequence_to_binary_encoding(sequence: str, pam_right: int) -> np.uint64:
 def reverse_complement(sequence: str) -> str:
     """Return the reverse complement of a DNA sequence.
 
-    Args:
-        sequence: The string DNA sequence to reverse complement.
+    :param sequence: The string DNA sequence to reverse complement.
+    :return: The reverse complemented string DNA sequence
     """
     return "".join([COMPLEMENT_MAP[base] for base in reversed(sequence)])
 
 
 def check_file_header(bytes: bytes) -> None:
-    """Check the header of the file from binary data
+    """Check the header of the file from binary data.
 
-    Args:
-        bytes: The binary data to check
+    :param bytes: The binary data to check
+    :raises ValueError: If the header file version is not supported
+    :raises ValueError: If the header length is not correct
+    :returns: None
     """
     if len(bytes) != HEADER_SIZE:
         raise ValueError("Invalid file header length")
@@ -97,10 +101,11 @@ def check_file_header(bytes: bytes) -> None:
 
 
 def get_file_metadata(bytes: bytes) -> Metadata:
-    """Parse the metadata from binary data
+    """Parse the metadata from binary data.
 
-    Args:
-        bytes: The binary data to parse
+    :param bytes: The binary data to parse
+    :raises ValueError: If the metadata length is not correct
+    :returns: A Metadata object containing the parsed metadata
     """
     if len(bytes) != METADATA_SIZE:
         raise ValueError("Invalid metadata length")
@@ -117,10 +122,10 @@ def get_file_metadata(bytes: bytes) -> Metadata:
 
 
 def parse_c_string(data: bytes) -> str:
-    """Parse a null-terminated C string from a byte array
+    """Parse a null-terminated C string from a byte array.
 
-    Args:
-        data: The byte array to parse
+    :param data: The byte array to parse
+    :returns: The parsed string
     """
     null = data.find(b"\x00")
     if null < 0:
@@ -130,10 +135,10 @@ def parse_c_string(data: bytes) -> str:
 
 
 def print_metadata(metadata: Metadata) -> None:
-    """Print the metadata information to STDERR
+    """Print the metadata information to STDERR.
 
-    Args:
-        metadata: The Metadata object
+    :param metadata: The Metadata object to print
+    :returns: None
     """
     print(
         f"Assembly is {metadata.assembly} ({metadata.species_name})",

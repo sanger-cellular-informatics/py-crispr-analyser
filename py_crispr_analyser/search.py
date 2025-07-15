@@ -24,10 +24,10 @@ def search(
 ) -> list[int]:
     """Search for a sequence in an indexed binary file
 
-    Args:
-        guides: The numpy uint64 array of guides
-        sequence: The query sequence to search for
-        verbose: A boolean to print verbose output
+    :param guides: The numpy uint64 array of guides
+    :param sequence: The query sequence to search for
+    :param verbose: A boolean to print verbose output
+    :return: A list of indices where the sequence is found
     """
     reverse_sequence = reverse_complement(sequence)
     query_sequence = sequence_to_binary_encoding(sequence, 1)
@@ -42,7 +42,11 @@ def search(
 
 
 def run(argv=sys.argv[1:]) -> None:
-    """Run the search command from the command line."""
+    """Run the search command from the command line.
+
+    :param argv: The command line arguments
+    :return: None
+    """
     inputfile = ""
     sequence = ""
 

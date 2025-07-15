@@ -34,14 +34,14 @@ def find_off_targets_kernel(
 ) -> None:
     """Find off-targets for a given query sequence using CUDA
 
-    Args:
-        guides: The array of encoded gRNA sequences
-        query_sequence: The query sequence
-        reverse_query_sequence: The reverse complement of the query sequence
-        summary: The array to store the results
-        off_target_ids_idx: The index for the off-target_ids array
-        off_target_ids: The array to store the off-target ids
-        offset: The offset of the guides default 0
+    :param guides: The array of encoded gRNA sequences
+    :param query_sequence: The query sequence
+    :param reverse_query_sequence: The reverse complement of the query sequence
+    :param summary: The array to store the results
+    :param off_target_ids_idx: The index for the off-target_ids array
+    :param off_target_ids: The array to store the off-target ids
+    :param offset: The offset of the guides default 0
+    :return: None
     """
     index = cuda.grid(1)
     threads_per_grid = cuda.gridDim.x * cuda.blockDim.x
@@ -69,13 +69,13 @@ def find_off_targets(
     reverse_query_sequence: np.uint64,
     offset: np.uint64 = 0,
 ) -> tuple[list[int], list[np.uint64]]:
-    """Find off-targets for a given query sequence using CPU
+    """Find off-targets for a given query sequence using the CPU
 
-    Args:
-        guides: The array of encoded gRNA sequences
-        query_sequence: The query sequence
-        reverse_query_sequence: The reverse complement of the query sequence
-        offset: The offset of the guides default 0
+    :param guides: The array of encoded gRNA sequences
+    :param query_sequence: The query sequence
+    :param reverse_query_sequence: The reverse complement of the query sequence
+    :param offset: The offset of the guides default 0
+    :return: A tuple containing a summary and a list of off-target ids
     """
     summary = [0] * MAX_MISSMATCHES
     off_target_ids = []
@@ -103,8 +103,8 @@ def _pop_count(x: np.uint64) -> np.uint64:
     the 4 will change pam_right to 0 so it doesnt get counted.
     5 is 0101, 4 is 0100
 
-    Args:
-        x: The integer to count the bits of
+    :param x: The integer to count the bits of
+    :return: The number of bits set in the integer
     """
     x = np.uint64((x | (x >> 1)) & 0x5555555555555555)
     x = (x & 0x3333333333333333) + ((x >> 2) & 0x3333333333333333)
@@ -115,9 +115,9 @@ def _pop_count(x: np.uint64) -> np.uint64:
 def reverse_complement_binary(sequence: np.uint64, size: int) -> np.uint64:
     """Reverse complement a binary sequence
 
-    Args:
-        sequence: The binary sequence to reverse complement
-        size: The size of the sequence
+    :param sequence: The binary sequence to reverse complement
+    :param size: The size of the sequence
+    :return: The reverse complemented binary sequence
     """
     mask = np.uint64(0xFFFFFFFFFFFFFFFF >> (63 - (size * 2)))
     sequence = ~sequence & mask
@@ -138,11 +138,11 @@ def print_off_targets(
 ) -> None:
     """Print the off targets to the console
 
-    Args:
-        crispr_id: The id of the CRISPR
-        summary: The summary of the off targets
-        off_target_ids: The off target CRISPR ids
-        species_id: The species id
+    :param crispr_id: The id of the CRISPR
+    :param summary: The summary of the off targets
+    :param off_target_ids: The off target CRISPR ids
+    :param species_id: The species id
+    :return: None
     """
     summary_output = ", ".join(
         [f"{i}: {summary[i]}" for i in range(MAX_MISSMATCHES)]
