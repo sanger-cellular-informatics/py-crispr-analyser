@@ -417,8 +417,8 @@ def test_find_off_targets(
     guide_list, query_sequence, reverse_query_sequence, expected_guides
 ):
     """The expected output using CPU based on output from:
-    https://github.com/htgt/crispacuda and
-    https://github.com/htgt/CRISPR-Analyser."""
+    https://github.com/sanger-cellular-informatics/crispacuda and
+    https://github.com/sanger-cellular-informatics/CRISPR-Analyser."""
     summary, off_target_ids = align.find_off_targets(
         guide_list, query_sequence, reverse_query_sequence, 0
     )
@@ -433,8 +433,8 @@ def test_find_off_targets_kernel(
     guide_list, query_sequence, reverse_query_sequence, expected_guides
 ):
     """The expected output using GPU based on output from:
-    https://github.com/htgt/crispacuda and
-    https://github.com/htgt/CRISPR-Analyser."""
+    https://github.com/sanger-cellular-informatics/crispacuda and
+    https://github.com/sanger-cellular-informatics/CRISPR-Analyser."""
     threads_per_block = 32
     blocks_per_grid = 392
     device_guides = cuda.to_device(guide_list)
