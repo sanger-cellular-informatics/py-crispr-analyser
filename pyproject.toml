@@ -52,8 +52,8 @@ crispr_analyser_index = "py_crispr_analyser.index:run"
 crispr_analyser_search = "py_crispr_analyser.search:run"
 
 [project.urls]
-Repository = "https://github.com/htgt/py-crispr-analyser"
-Issues = "https://github.com/htgt/py-crispr-analyser/issues"
+Repository = "https://github.com/sanger-cellular-informatics/py-crispr-analyser"
+Issues = "https://github.com/sanger-cellular-informatics/py-crispr-analyser/issues"
 
 [tool.sphinx-pyproject]
 copyright = "2025 Genome Research Ltd"

@@ -19,7 +19,7 @@ pip install py-crispr-analyser
 Alternatively the source code can be downloaded from Github:
 
 ```bash
-git clone git@github.com:htgt/py-crispr-analyser.git
+git clone git@github.com:sanger-cellular-informatics/py-crispr-analyser.git
 ```
 
 Make sure you have Python {{requires_python}}.
