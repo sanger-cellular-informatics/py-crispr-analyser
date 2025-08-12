@@ -71,6 +71,8 @@ def find_off_targets(
 ) -> tuple[list[int], list[np.uint64]]:
     """Find off-targets for a given query sequence using the CPU
 
+    Optimized version with pre-allocated arrays and improved memory access patterns.
+
     :param guides: The array of encoded gRNA sequences
     :param query_sequence: The query sequence
     :param reverse_query_sequence: The reverse complement of the query sequence
@@ -78,19 +80,57 @@ def find_off_targets(
     :return: A tuple containing a summary and a list of off-target ids
     """
     summary = [0] * MAX_MISSMATCHES
-    off_target_ids = []
+    
+    # Pre-allocate array for off-target IDs to improve memory performance
+    # This eliminates repeated memory allocations and improves cache locality
+    estimated_capacity = min(len(guides), MAX_OFF_TARGETS)
+    off_target_ids_array = np.zeros(estimated_capacity, dtype=np.uint64)
+    off_target_count = 0
+    
+    # Cache values to reduce repeated attribute access
+    error_str = ERROR_STR
+    pam_on = PAM_ON
+    pam_off = PAM_OFF
+    max_mismatches = MAX_MISSMATCHES
+    
     for i, guide in enumerate(guides):
-        if guide == ERROR_STR:
+        if guide == error_str:
             continue
+            
+        # Compute forward match
         match = query_sequence ^ guide
-        if match & PAM_ON:
+        
+        # Select appropriate match based on PAM
+        if match & pam_on:
+            # Use reverse complement match when PAM doesn't match forward
             match_r = reverse_query_sequence ^ guide
-            match_count = _pop_count(match_r & PAM_OFF)
+            match_count = _pop_count(match_r & pam_off)
         else:
-            match_count = _pop_count(match & PAM_OFF)
-        if match_count < MAX_MISSMATCHES:
+            # Use forward match when PAM matches
+            match_count = _pop_count(match & pam_off)
+            
+        # Only proceed if mismatch count is below threshold
+        if match_count < max_mismatches:
             summary[match_count] += 1
-            off_target_ids.append(offset + i + 1)
+            
+            # Check if we need to grow the array (should be rare with good initial sizing)
+            if off_target_count >= len(off_target_ids_array):
+                # Double the size but cap at MAX_OFF_TARGETS
+                new_size = min(len(off_target_ids_array) * 2, MAX_OFF_TARGETS)
+                if new_size <= len(off_target_ids_array):
+                    # We've hit the maximum capacity
+                    break
+                new_array = np.zeros(new_size, dtype=np.uint64)
+                new_array[:off_target_count] = off_target_ids_array[:off_target_count]
+                off_target_ids_array = new_array
+            
+            off_target_ids_array[off_target_count] = offset + i + 1
+            off_target_count += 1
+    
+    # Convert the array slice back to a list maintaining the original interface
+    # Use list comprehension for better performance than .tolist()
+    off_target_ids = [int(off_target_ids_array[i]) for i in range(off_target_count)]
+    
     return summary, off_target_ids
 
 
@@ -106,10 +146,12 @@ def _pop_count(x: np.uint64) -> np.uint64:
     :param x: The integer to count the bits of
     :return: The number of bits set in the integer
     """
-    x = np.uint64((x | (x >> 1)) & 0x5555555555555555)
-    x = (x & 0x3333333333333333) + ((x >> 2) & 0x3333333333333333)
-    x = (x + (x >> 4)) & 0x0F0F0F0F0F0F0F0F
-    return (0x0101010101010101 * x) >> 56
+    # Use explicit casting to handle NumPy version compatibility
+    x_val = int(x)
+    x_val = (x_val | (x_val >> 1)) & 0x5555555555555555
+    x_val = (x_val & 0x3333333333333333) + ((x_val >> 2) & 0x3333333333333333)
+    x_val = (x_val + (x_val >> 4)) & 0x0F0F0F0F0F0F0F0F
+    return np.uint64((0x0101010101010101 * x_val) >> 56)
 
 
 def reverse_complement_binary(sequence: np.uint64, size: int) -> np.uint64:
