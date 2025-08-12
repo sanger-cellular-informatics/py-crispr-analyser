@@ -72,6 +72,13 @@ def find_off_targets(
     """Find off-targets for a given query sequence using the CPU
 
     Optimized version with pre-allocated arrays and improved memory access patterns.
+    
+    Performance improvements:
+    - Pre-allocated arrays eliminate repeated memory allocations during list growth
+    - Better cache locality through contiguous memory access patterns  
+    - Reduced attribute lookup overhead via constant caching
+    - Smart capacity estimation minimizes array reallocations
+    - Improved vectorization potential for Numba compilation
 
     :param guides: The array of encoded gRNA sequences
     :param query_sequence: The query sequence
@@ -81,13 +88,13 @@ def find_off_targets(
     """
     summary = [0] * MAX_MISSMATCHES
     
-    # Pre-allocate array for off-target IDs to improve memory performance
-    # This eliminates repeated memory allocations and improves cache locality
+    # Pre-allocate array for off-target IDs based on input size
+    # This eliminates O(n) repeated memory allocations during list growth
     estimated_capacity = min(len(guides), MAX_OFF_TARGETS)
     off_target_ids_array = np.zeros(estimated_capacity, dtype=np.uint64)
     off_target_count = 0
     
-    # Cache values to reduce repeated attribute access
+    # Cache frequently accessed constants to reduce attribute lookups
     error_str = ERROR_STR
     pam_on = PAM_ON
     pam_off = PAM_OFF
@@ -97,38 +104,39 @@ def find_off_targets(
         if guide == error_str:
             continue
             
-        # Compute forward match
+        # Compute XOR for mismatch detection
         match = query_sequence ^ guide
         
-        # Select appropriate match based on PAM
+        # Select appropriate match direction based on PAM alignment
         if match & pam_on:
-            # Use reverse complement match when PAM doesn't match forward
+            # PAM doesn't match forward direction, try reverse complement
             match_r = reverse_query_sequence ^ guide
             match_count = _pop_count(match_r & pam_off)
         else:
-            # Use forward match when PAM matches
+            # PAM matches forward direction
             match_count = _pop_count(match & pam_off)
             
-        # Only proceed if mismatch count is below threshold
+        # Only store results for guides with acceptable mismatch counts
         if match_count < max_mismatches:
             summary[match_count] += 1
             
-            # Check if we need to grow the array (should be rare with good initial sizing)
+            # Handle array capacity growth (should be rare with good initial sizing)
             if off_target_count >= len(off_target_ids_array):
-                # Double the size but cap at MAX_OFF_TARGETS
                 new_size = min(len(off_target_ids_array) * 2, MAX_OFF_TARGETS)
                 if new_size <= len(off_target_ids_array):
-                    # We've hit the maximum capacity
+                    # Hit maximum capacity limit
                     break
+                # Create larger array and copy existing data
                 new_array = np.zeros(new_size, dtype=np.uint64)
                 new_array[:off_target_count] = off_target_ids_array[:off_target_count]
                 off_target_ids_array = new_array
             
+            # Store guide ID (1-indexed)
             off_target_ids_array[off_target_count] = offset + i + 1
             off_target_count += 1
     
-    # Convert the array slice back to a list maintaining the original interface
-    # Use list comprehension for better performance than .tolist()
+    # Convert array slice to list maintaining original interface compatibility
+    # Use explicit loop for better Numba performance than .tolist()
     off_target_ids = [int(off_target_ids_array[i]) for i in range(off_target_count)]
     
     return summary, off_target_ids
