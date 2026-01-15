@@ -1,4 +1,4 @@
-# Copyright (C) 2025 Genome Research Ltd.
+# Copyright (C) 2025-2026 Genome Research Ltd.
 
 import getopt
 import numpy as np
@@ -67,7 +67,7 @@ def find_off_targets(
     guides: np.ndarray,
     query_sequence: np.uint64,
     reverse_query_sequence: np.uint64,
-    offset: np.uint64 = 0,
+    offset: np.uint64 = np.uint64(0),
 ) -> tuple[list[int], list[np.uint64]]:
     """Find off-targets for a given query sequence using the CPU
 
@@ -107,9 +107,9 @@ def _pop_count(x: np.uint64) -> np.uint64:
     :return: The number of bits set in the integer
     """
     x = np.uint64((x | (x >> 1)) & 0x5555555555555555)
-    x = (x & 0x3333333333333333) + ((x >> 2) & 0x3333333333333333)
+    x = (x & 0x3333333333333333) + ((x >> 2) & 0x3333333333333333) # type: ignore
     x = (x + (x >> 4)) & 0x0F0F0F0F0F0F0F0F
-    return (0x0101010101010101 * x) >> 56
+    return (0x0101010101010101 * x) >> 56 # type: ignore
 
 
 def reverse_complement_binary(sequence: np.uint64, size: int) -> np.uint64:
@@ -123,11 +123,11 @@ def reverse_complement_binary(sequence: np.uint64, size: int) -> np.uint64:
     sequence = ~sequence & mask
     reversed = sequence >> (size * 2)
     shift = 0
-    for i in range(size):
+    for _ in range(size):
         reversed <<= 2
         reversed |= (sequence >> shift) & 0x3
         shift += 2
-    return reversed
+    return np.uint64(reversed)
 
 
 def print_off_targets(

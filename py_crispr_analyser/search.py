@@ -1,4 +1,4 @@
-# Copyright (C) 2025 Genome Research Ltd.
+# Copyright (C) 2025-2026 Genome Research Ltd.
 
 import getopt
 import numpy as np
@@ -20,7 +20,6 @@ from .utils import (
 def search(
     guides: np.ndarray,
     sequence: str,
-    verbose: bool = False,
 ) -> list[int]:
     """Search for a sequence in an indexed binary file
 
@@ -60,7 +59,7 @@ def run(argv=sys.argv[1:]) -> None:
         )
 
     try:
-        opts, args = getopt.getopt(
+        opts, _ = getopt.getopt(
             argv,
             "hi:s:",
             [
@@ -95,7 +94,6 @@ def run(argv=sys.argv[1:]) -> None:
         indices = search(
             guides=guides,
             sequence=sequence,
-            verbose=True,
         )
         print(f"Found {len(indices)} exact matches", file=sys.stderr)
         print("Found the following matches:", file=sys.stderr)
