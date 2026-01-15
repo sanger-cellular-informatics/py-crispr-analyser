@@ -1,4 +1,4 @@
-# Copyright (C) 2025 Genome Research Ltd.
+# Copyright (C) 2025-2026 Genome Research Ltd.
 
 [build-system]
 build-backend = "hatchling.build"
@@ -7,7 +7,7 @@ requires = ["hatchling"]
 [project]
 name = "py-crispr-analyser"
 description = "Analyse a genome for CRISPRs and off-targets"
-version = "1.0.2"
+version = "1.0.3"
 license = "MIT"
 license-files = ["LICENSE"]
 readme = "README.md"
@@ -58,7 +58,7 @@ Repository = "https://github.com/sanger-cellular-informatics/py-crispr-analyser"
 Issues = "https://github.com/sanger-cellular-informatics/py-crispr-analyser/issues"
 
 [tool.sphinx-pyproject]
-copyright = "2025 Genome Research Ltd"
+copyright = "2025-2026 Genome Research Ltd"
 project = "py-crispr-analyser"
 
 [tool.sphinx-pyproject.myst_substitutions]

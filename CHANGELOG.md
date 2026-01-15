@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.3 (2026-01-15)
+
+### Added or Changed
+- Fixed issue where the API documentation was not shown correctly
+- Cleaned up some linter issues
+
 ## v1.0.2 (2025-07-17)
 
 ### Added or Changed
