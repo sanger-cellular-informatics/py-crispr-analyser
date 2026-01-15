@@ -1,4 +1,4 @@
-# Copyright (C) 2025 Genome Research Ltd.
+# Copyright (C) 2025-2026 Genome Research Ltd.
 
 import collections
 import csv
@@ -56,8 +56,7 @@ def gather(
         is added to CSV file (always equalling 1). Default is False.
     :return: None
     """
-    if verbose:
-        start = time.time()
+    start = time.time()
     chromosome = ""
     crispr_count = 0
     position = 0
@@ -70,9 +69,12 @@ def gather(
                 if len(line) == 0:
                     continue
                 if line[0] == ">":
-                    chromosome = re.search(
-                        r">(.*?) dna:chromosome", line
-                    ).group(1)
+                    match = re.search(r">(.*?) dna:chromosome", line)
+                    if not match:
+                        raise ValueError(
+                            f"Could not extract chromosome name from header: {line}"
+                        )
+                    chromosome = match.group(1)
                     if verbose:
                         print(f"Processing chromosome {chromosome}...")
                     position = 0
@@ -86,7 +88,7 @@ def gather(
                             continue
                         position += 1
                         if match_pam(
-                            dna_sequence=buffer,
+                            dna_sequence="".join(buffer),
                             pam_sequence=reverse_complement(pam),
                             pam_on_right=False,
                         ):
@@ -98,7 +100,7 @@ def gather(
                             csvwriter.writerow(output)
                             crispr_count += 1
                         if match_pam(
-                            dna_sequence=buffer,
+                            dna_sequence="".join(buffer),
                             pam_sequence=pam,
                             pam_on_right=True,
                         ):
@@ -131,7 +133,7 @@ def run(argv=sys.argv[1:]):
         )
 
     try:
-        opts, args = getopt.getopt(
+        opts, _ = getopt.getopt(
             argv, "hi:o:p:", ["help", "ifile=", "ofile=", "pam="]
         )
     except getopt.GetoptError:

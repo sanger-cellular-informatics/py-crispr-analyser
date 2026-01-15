@@ -1,4 +1,4 @@
-# Copyright (C) 2025 Genome Research Ltd.
+# Copyright (C) 2025-2026 Genome Research Ltd.
 
 from dataclasses import dataclass
 import numpy as np
@@ -20,8 +20,8 @@ PADDING_FORMAT = "<BBB"
 
 @dataclass
 class Metadata:
-    """A dataclass to hold metadata information from the guides file.
-    """
+    """A dataclass to hold metadata information from the guides file."""
+
     number_of_sequences: np.uint64
     sequence_length: np.uint64
     offset: np.uint64
@@ -39,8 +39,7 @@ def get_guides(
     :param verbose: A boolean to print verbose output
     :return: A numpy array of guides
     """
-    if verbose:
-        start = time.time()
+    start = time.time()
     guidesfile_handle.seek(HEADER_SIZE)
     # read the number of sequences in the header
     number_of_guides = struct.unpack("<Q", guidesfile_handle.read(8))[0]
@@ -70,8 +69,10 @@ def sequence_to_binary_encoding(sequence: str, pam_right: int) -> np.uint64:
             bits = ERROR_STR  # set the error flag if we encounter an 'N'
             break
         else:
-            bits <<= 2  # shift left to make room for new char
-            bits |= ENCODING_MAP[character]  # add our new char to the end
+            bits = np.uint64(bits << 2)  # shift left to make room for new char
+            bits = np.uint64(
+                bits | ENCODING_MAP[character]
+            )  # add our new char to the end
     return bits
 
 

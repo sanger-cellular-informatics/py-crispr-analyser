@@ -14,7 +14,7 @@ All documentation is online at [https://py-crispr-analyser.readthedocs.io/](http
 
 ## Copyright
 
-Copyright (C) 2025 Genome Research Ltd.
+Copyright (C) 2025-2026 Genome Research Ltd.
 
 
 ## License

@@ -1,4 +1,4 @@
-# Copyright (C) 2025 Genome Research Ltd.
+# Copyright (C) 2025-2026 Genome Research Ltd.
 
 import getopt
 import numpy as np
@@ -35,8 +35,8 @@ def create_metadata(
     sequence_length = np.uint64(sequence_length)
     offset = np.uint64(offset)
     species_id = np.uint8(species_id)
-    species_name = species_name.encode("utf-8")
-    assembly = assembly.encode("utf-8")
+    species_name_bytes = species_name.encode("utf-8")
+    assembly_bytes = assembly.encode("utf-8")
 
     return struct.pack(
         format,
@@ -44,12 +44,14 @@ def create_metadata(
         sequence_length,
         offset,
         species_id,
-        species_name,
-        assembly,
+        species_name_bytes,
+        assembly_bytes,
     )
 
 
-def parse_record(record: str, guide_length: int, pam_length: int) -> (str, int):
+def parse_record(
+    record: str, guide_length: int, pam_length: int
+) -> tuple[str, int]:
     """Parse a line from the input CSV file
 
     :param record: A line from the input CSV file
@@ -103,8 +105,7 @@ def index(
         Default is False.
     :return: None
     """
-    if verbose:
-        start = time.time()
+    start = time.time()
     number_of_sequences = np.uint64(0)
     if verbose:
         print("Outfile:")
@@ -122,9 +123,9 @@ def index(
         out_file.write(
             create_metadata(
                 number_of_sequences,
-                guide_length,
-                offset,
-                species_id,
+                np.uint64(guide_length),
+                np.uint64(offset),
+                np.uint8(species_id),
                 species,
                 assembly,
             )
@@ -183,7 +184,7 @@ def run(argv=sys.argv[1:]) -> None:
         )
 
     try:
-        opts, args = getopt.getopt(
+        opts, _ = getopt.getopt(
             argv,
             "hi:o:a:s:f:e:g:p:",
             [
@@ -235,8 +236,8 @@ def run(argv=sys.argv[1:]) -> None:
         outputfile,
         species,
         assembly,
-        offset,
-        species_id,
+        int(offset),
+        int(species_id),
         guide_length,
         pam_length,
         verbose=True,

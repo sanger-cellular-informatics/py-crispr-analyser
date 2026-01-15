@@ -1,4 +1,4 @@
-# Copyright (C) 2025 Genome Research Ltd.
+# Copyright (C) 2025-2026 Genome Research Ltd.
 
 import pytest
 import py_crispr_analyser.gather as gather
@@ -512,3 +512,19 @@ class TestGather:
             legacy_mode=False,
         )
         assert outfile.read_text() == expected_csv_with_multiple_chromosomes_non_legacy
+
+    def test_invalid_chromosome_header_raises_value_error(self, tmp_path):
+        """Test that a FASTA file without a valid chromosome name raises ValueError"""
+        d = tmp_path / "test"
+        d.mkdir()
+        infile = d / "test.fasta"
+        infile.write_text(">invalid_header without proper format\nGATCACATGC")
+        outfile = d / "test.csv"
+        with pytest.raises(ValueError, match="Could not extract chromosome name from header"):
+            gather.gather(
+                inputfile=infile,
+                outputfile=outfile,
+                pam="NGG",
+                verbose=False,
+                legacy_mode=False,
+            )
