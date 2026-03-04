@@ -2,7 +2,7 @@
 
 import getopt
 import numpy as np
-from numba import jit, cuda
+from numba import jit, prange, cuda
 import sys
 
 from .utils import (
@@ -62,6 +62,50 @@ def find_off_targets_kernel(
                 cuda.atomic.add(off_target_ids, idx, offset + i + 1)
 
 
+@jit(nopython=True, parallel=True)
+def find_off_targets_cpu(
+    guides: np.ndarray,
+    query_sequence: np.uint64,
+    reverse_query_sequence: np.uint64,
+    summary: np.ndarray,
+    off_target_ids_idx: np.ndarray,
+    off_target_ids: np.ndarray,
+    offset: np.uint64,
+) -> None:
+    """Find off-targets for a given query sequence using parallel CPU
+
+    :param guides: The array of encoded gRNA sequences
+    :param query_sequence: The query sequence
+    :param reverse_query_sequence: The reverse complement of the query sequence
+    :param summary: The array to store the mismatch count summary
+    :param off_target_ids_idx: Single-element array holding the next write index
+    :param off_target_ids: The array to store the off-target ids
+    :param offset: The offset of the guides, default 0
+    :return: None
+    """
+    match_counts = np.full(guides.size, np.int64(MAX_MISSMATCHES), dtype=np.int64)
+
+    for i in prange(guides.size):
+        if guides[i] == ERROR_STR:
+            continue
+        match = query_sequence ^ guides[i]
+        if match & PAM_ON:
+            match_r = reverse_query_sequence ^ guides[i]
+            nos_off_targets = _pop_count(match_r & PAM_OFF)
+        else:
+            nos_off_targets = _pop_count(match & PAM_OFF)
+        if nos_off_targets < MAX_MISSMATCHES:
+            match_counts[i] = np.int64(nos_off_targets)
+
+    for i in range(guides.size):
+        mc = match_counts[i]
+        if mc < MAX_MISSMATCHES:
+            summary[mc] += 1
+            idx = off_target_ids_idx[0]
+            off_target_ids_idx[0] += 1
+            off_target_ids[idx] = offset + np.uint64(i) + np.uint64(1)
+
+
 @jit
 def find_off_targets(
     guides: np.ndarray,
@@ -76,6 +120,9 @@ def find_off_targets(
     :param reverse_query_sequence: The reverse complement of the query sequence
     :param offset: The offset of the guides default 0
     :return: A tuple containing a summary and a list of off-target ids
+
+    .. deprecated:: 1.0.4
+       :func:`find_off_targets_cpu` is far more performant.
     """
     summary = [0] * MAX_MISSMATCHES
     off_target_ids = []
@@ -218,14 +265,15 @@ def run(argv=sys.argv[1:]) -> None:
                 guides.size + (threads_per_block - 1) // threads_per_block
             )
 
-            for i in range(len(args)):
-                query_sequence = guides[int(args[i]) - 1]
-                reverse_query_sequence = reverse_complement_binary(
-                    query_sequence, 20
-                )
-                summary = np.zeros(MAX_MISSMATCHES, dtype=np.uint32)
-                off_target_ids_idx = np.zeros(1, dtype=np.uint32)
-                off_target_ids = np.zeros(MAX_OFF_TARGETS, dtype=np.uint32)
+        for i in range(len(args)):
+            query_sequence = guides[int(args[i]) - 1]
+            reverse_query_sequence = reverse_complement_binary(
+                query_sequence, 20
+            )
+            summary = np.zeros(MAX_MISSMATCHES, dtype=np.uint32)
+            off_target_ids_idx = np.zeros(1, dtype=np.uint32)
+            off_target_ids = np.zeros(MAX_OFF_TARGETS, dtype=np.uint32)
+            if use_cuda & cuda.is_available():
                 device_summary = cuda.to_device(summary)
                 device_off_target_ids_idx = cuda.to_device(off_target_ids_idx)
                 device_off_target_ids = cuda.to_device(off_target_ids)
@@ -238,28 +286,21 @@ def run(argv=sys.argv[1:]) -> None:
                     device_off_target_ids,
                     metadata.offset,
                 )
-                host_summary = device_summary.copy_to_host()
-                host_off_target_ids = np.trim_zeros(
-                    device_off_target_ids.copy_to_host()
-                )
-                print_off_targets(
-                    args[i],
-                    host_summary,
-                    np.sort(host_off_target_ids),
-                    metadata.species_id,
-                )
-        else:
-            for i in range(len(args)):
-                query_sequence = guides[int(args[i]) - 1]
-                reverse_query_sequence = reverse_complement_binary(
-                    query_sequence, 20
-                )
-                summary, off_target_ids = find_off_targets(
+                summary = device_summary.copy_to_host()
+                off_target_ids = device_off_target_ids.copy_to_host()
+            else:
+                find_off_targets_cpu(
                     guides,
                     query_sequence,
                     reverse_query_sequence,
+                    summary,
+                    off_target_ids_idx,
+                    off_target_ids,
                     metadata.offset,
                 )
-                print_off_targets(
-                    args[i], summary, off_target_ids, metadata.species_id
-                )
+            print_off_targets(
+                args[i],
+                summary,
+                np.sort(np.trim_zeros(off_target_ids)),
+                metadata.species_id,
+            )
