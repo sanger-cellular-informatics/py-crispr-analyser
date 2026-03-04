@@ -426,6 +426,58 @@ def test_find_off_targets(
     assert off_target_ids == expected_guides
 
 
+def test_find_off_targets_cpu(
+    guide_list, query_sequence, reverse_query_sequence, expected_guides
+):
+    """The expected output using parallel CPU should match the reference output
+    from https://github.com/sanger-cellular-informatics/CRISPR-Analyser."""
+    summary = np.zeros(5, dtype=np.uint32)
+    off_target_ids_idx = np.zeros(1, dtype=np.uint32)
+    off_target_ids = np.zeros(2000, dtype=np.uint32)
+    align.find_off_targets_cpu(
+        guide_list,
+        query_sequence,
+        reverse_query_sequence,
+        summary,
+        off_target_ids_idx,
+        off_target_ids,
+        np.uint64(0),
+    )
+    trimmed = np.trim_zeros(off_target_ids)
+    np.testing.assert_array_equal(
+        summary, np.array([2, 0, 1, 36, 350], dtype=np.uint32)
+    )
+    np.testing.assert_array_equal(
+        np.sort(trimmed), np.array(expected_guides, dtype=np.uint32)
+    )
+
+
+def test_find_off_targets_cpu_with_offset(query_sequence, reverse_query_sequence):
+    """Offset shifts all returned off-target IDs by the given amount."""
+    guides = np.array(
+        [query_sequence, query_sequence, query_sequence], dtype=np.uint64
+    )
+    offset = np.uint64(10)
+    summary = np.zeros(5, dtype=np.uint32)
+    off_target_ids_idx = np.zeros(1, dtype=np.uint32)
+    off_target_ids = np.zeros(2000, dtype=np.uint32)
+    align.find_off_targets_cpu(
+        guides,
+        query_sequence,
+        reverse_query_sequence,
+        summary,
+        off_target_ids_idx,
+        off_target_ids,
+        offset,
+    )
+    trimmed = np.trim_zeros(off_target_ids)
+    # Each of the 3 guides is an exact match (0 mismatches), IDs = offset + i + 1
+    np.testing.assert_array_equal(summary[0], 3)
+    np.testing.assert_array_equal(
+        np.sort(trimmed), np.array([11, 12, 13], dtype=np.uint32)
+    )
+
+
 @pytest.mark.skipif(
     cuda.is_available() is False, reason="CUDA is not available"
 )
@@ -478,7 +530,7 @@ def test_reverse_complement_binary(query_sequence, reverse_query_sequence):
     )
 
 
-def test_run(tmp_path, guides_file, capsys):
+def test_run(guides_file, capsys):
     expected_start = "101\t1"
     expected_ids = (
         "{6,8,9,10,14,18,30,33,56,78,86,87,92,101,112,116,128,151,"

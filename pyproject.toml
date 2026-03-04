@@ -37,6 +37,7 @@ dev = [
   "black>=25.1.0,<26",
   "flake8>=7.1.2,<8",
   "pytest>=8.3.5,<9",
+  "pytest-benchmark>=5.2.3",
 ]
 # if changing the sphinx dependencies, please also update the
 # docs/requirements.txt file
@@ -64,6 +65,10 @@ project = "py-crispr-analyser"
 [tool.sphinx-pyproject.myst_substitutions]
 tested_cuda_version = "12.4"
 requires_python = ">=3.12"
+
+[tool.pytest.ini_options]
+python_files = ["test_*.py", "bench_*.py"]
+python_functions = ["test_*", "bench_*"]
 
 [tool.black]
 line-length = 80
