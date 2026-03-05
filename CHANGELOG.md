@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.0 (2026-03-05)
+
+### Added or Changed
+- Added align.find_off_targets_cpu function which uses Numba's @jit parallel=True
+- Added benchmarks for all the find_off_targets* functions
+- deprecated align.find_off_targets
+
 ## v1.0.3 (2026-01-15)
 
 ### Added or Changed
