@@ -110,6 +110,51 @@ class TestSearch:
             == []
         )
 
+    def test_pam_right_only(self, guides_array_with_matches):
+        assert search.search(
+            guides_array_with_matches, "AAAACTGGAAACTGGTTCTC", pam_right=1
+        ) == [1]
+
+    def test_pam_left_only(self, guides_array_with_matches):
+        assert search.search(
+            guides_array_with_matches, "AAAACTGGAAACTGGTTCTC", pam_right=0
+        ) == [3]
+
+    def test_pam_both_explicit(self, guides_array_with_matches):
+        assert search.search(
+            guides_array_with_matches, "AAAACTGGAAACTGGTTCTC", pam_right=2
+        ) == [1, 3]
+
+    def test_invalid_pam_right_raises_value_error(
+        self, guides_array_with_matches
+    ):
+        with pytest.raises(ValueError, match="Unknown pam_right value: 3"):
+            search.search(
+                guides_array_with_matches,
+                "AAAACTGGAAACTGGTTCTC",
+                pam_right=3,
+            )
+
+    def test_pam_right_no_matches(self, guides_array_with_no_matches):
+        assert (
+            search.search(
+                guides_array_with_no_matches,
+                "AAAACTGGAAACTGGTTCTC",
+                pam_right=1,
+            )
+            == []
+        )
+
+    def test_pam_left_no_matches(self, guides_array_with_no_matches):
+        assert (
+            search.search(
+                guides_array_with_no_matches,
+                "AAAACTGGAAACTGGTTCTC",
+                pam_right=0,
+            )
+            == []
+        )
+
 
 class TestRun:
     def test_multiple_sequences_are_found(
@@ -138,3 +183,33 @@ class TestRun:
         search.run(args)
         captured = capsys.readouterr()
         assert "Found 0 exact matches" in captured.err
+
+    def test_pam_right_filter(self, guides_with_matches_file, capsys):
+        """Test that -p 1 only returns PAM-right matches"""
+        args = [
+            "-i",
+            guides_with_matches_file,
+            "-s",
+            "AAAACTGGAAACTGGTTCTC",
+            "-p",
+            "1",
+        ]
+        search.run(args)
+        captured = capsys.readouterr()
+        assert "Found 1 exact matches" in captured.err
+        assert "\t89" in captured.out
+
+    def test_pam_left_filter(self, guides_with_matches_file, capsys):
+        """Test that -p 0 only returns PAM-left matches"""
+        args = [
+            "-i",
+            guides_with_matches_file,
+            "-s",
+            "AAAACTGGAAACTGGTTCTC",
+            "-p",
+            "0",
+        ]
+        search.run(args)
+        captured = capsys.readouterr()
+        assert "Found 1 exact matches" in captured.err
+        assert "\t91" in captured.out

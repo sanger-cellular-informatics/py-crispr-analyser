@@ -20,20 +20,27 @@ from .utils import (
 def search(
     guides: np.ndarray,
     sequence: str,
+    pam_right: int = 2,
 ) -> list[int]:
     """Search for a sequence in an indexed binary file
 
     :param guides: The numpy uint64 array of guides
     :param sequence: The query sequence to search for
-    :param verbose: A boolean to print verbose output
+    :param pam_right: PAM position filter — 0 for left, 1 for right, 2 for both
     :return: A list of indices where the sequence is found
     """
     reverse_sequence = reverse_complement(sequence)
     query_sequence = sequence_to_binary_encoding(sequence, 1)
     reverse_query_sequence = sequence_to_binary_encoding(reverse_sequence, 0)
-    indices = np.where(
-        (guides == query_sequence) | (guides == reverse_query_sequence)
-    )
+    if pam_right == 1:
+        mask = guides == query_sequence
+    elif pam_right == 0:
+        mask = guides == reverse_query_sequence
+    elif pam_right == 2:
+        mask = (guides == query_sequence) | (guides == reverse_query_sequence)
+    else:
+        raise ValueError(f"Unknown pam_right value: {pam_right}")
+    indices = np.where(mask)
     # the binary index is 0-based,
     # so we add the offset and 1 to make it 1-based as per the db
     # this follows how we numbered the WGE index
@@ -48,6 +55,7 @@ def run(argv=sys.argv[1:]) -> None:
     """
     inputfile = ""
     sequence = ""
+    pam_right = 2
 
     def usage() -> None:
         print(
@@ -55,17 +63,19 @@ def run(argv=sys.argv[1:]) -> None:
 -h, --help            Print this help message
 -i, --ifile <file>    The input binary guides file
 -s, --sequence <str>  The guide sequence to search for
+-p, --pam_right <int> PAM position: 0=left, 1=right, 2=both (default: 2)
 """
         )
 
     try:
         opts, _ = getopt.getopt(
             argv,
-            "hi:s:",
+            "hi:s:p:",
             [
                 "help",
                 "ifile=",
                 "sequence=",
+                "pam_right=",
             ],
         )
     except getopt.GetoptError as err:
@@ -80,6 +90,8 @@ def run(argv=sys.argv[1:]) -> None:
             inputfile = arg
         elif opt in ("-s", "--sequence"):
             sequence = arg
+        elif opt in ("-p", "--pam_right"):
+            pam_right = int(arg)
     if inputfile == "" or sequence == "":
         usage()
         sys.exit(2)
@@ -94,6 +106,7 @@ def run(argv=sys.argv[1:]) -> None:
         indices = search(
             guides=guides,
             sequence=sequence,
+            pam_right=pam_right,
         )
         print(f"Found {len(indices)} exact matches", file=sys.stderr)
         print("Found the following matches:", file=sys.stderr)
