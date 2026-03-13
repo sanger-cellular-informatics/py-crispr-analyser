@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.1 (2026-03-13)
+
+### Added or Changed
+- Added pam_right option for search to allow for left PAM, righ PAM or both (default)
+
 ## v1.1.0 (2026-03-05)
 
 ### Added or Changed
