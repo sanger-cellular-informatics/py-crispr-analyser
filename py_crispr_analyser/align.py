@@ -83,7 +83,9 @@ def find_off_targets_cpu(
     :param offset: The offset of the guides, default 0
     :return: None
     """
-    match_counts = np.full(guides.size, np.int64(MAX_MISSMATCHES), dtype=np.int64)
+    match_counts = np.full(
+        guides.size, np.int64(MAX_MISSMATCHES), dtype=np.int64
+    )
 
     for i in prange(guides.size):
         if guides[i] == ERROR_STR:
@@ -154,9 +156,9 @@ def _pop_count(x: np.uint64) -> np.uint64:
     :return: The number of bits set in the integer
     """
     x = np.uint64((x | (x >> 1)) & 0x5555555555555555)
-    x = (x & 0x3333333333333333) + ((x >> 2) & 0x3333333333333333) # type: ignore
+    x = (x & 0x3333333333333333) + ((x >> 2) & 0x3333333333333333)  # type: ignore
     x = (x + (x >> 4)) & 0x0F0F0F0F0F0F0F0F
-    return (0x0101010101010101 * x) >> 56 # type: ignore
+    return (0x0101010101010101 * x) >> 56  # type: ignore
 
 
 def reverse_complement_binary(sequence: np.uint64, size: int) -> np.uint64:
@@ -198,9 +200,10 @@ def print_off_targets(
     if len(off_target_ids) >= MAX_OFF_TARGETS:
         print(f"{crispr_id}\t{species_id}\t{{{summary_output}}}")
     else:
+        ids_str = ",".join(map(str, off_target_ids))
         print(
             f"{crispr_id}\t{species_id}\t"
-            f"{{{",".join(map(str, off_target_ids))}}}\t{{{summary_output}}}"
+            f"{{{ids_str}}}\t{{{summary_output}}}"
         )
 
 

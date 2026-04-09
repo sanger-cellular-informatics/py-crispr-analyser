@@ -354,7 +354,10 @@ class TestRun:
     """Test the command line run function"""
 
     def test_with_ngg_pam(
-        self, tmp_path, single_chromosome_fasta, expected_csv_with_ngg_pam_legacy
+        self,
+        tmp_path,
+        single_chromosome_fasta,
+        expected_csv_with_ngg_pam_legacy,
     ):
         """Test that we can run the script with NGG PAM""",
         d = tmp_path / "test"
@@ -367,7 +370,10 @@ class TestRun:
         assert outfile.read_text() == expected_csv_with_ngg_pam_legacy
 
     def test_with_ngn_pam(
-        self, tmp_path, single_chromosome_fasta, expected_csv_with_ngn_pam_legacy
+        self,
+        tmp_path,
+        single_chromosome_fasta,
+        expected_csv_with_ngn_pam_legacy,
     ):
         """Test that we can run the script with NGN PAM"""
         d = tmp_path / "test"
@@ -393,14 +399,19 @@ class TestRun:
         outfile = d / "test.csv"
         args = ["-i", infile, "-o", outfile, "-p", "NGG"]
         gather.run(args)
-        assert outfile.read_text() == expected_csv_with_multiple_chromosomes_legacy
+        assert (
+            outfile.read_text() == expected_csv_with_multiple_chromosomes_legacy
+        )
 
 
 class TestGather:
     """Test the gather function"""
 
     def test_with_ngg_pam_legacy(
-        self, tmp_path, single_chromosome_fasta, expected_csv_with_ngg_pam_legacy
+        self,
+        tmp_path,
+        single_chromosome_fasta,
+        expected_csv_with_ngg_pam_legacy,
     ):
         """Test that we can run the script with NGG PAM in legacy mode"""
         d = tmp_path / "test"
@@ -418,7 +429,10 @@ class TestGather:
         assert outfile.read_text() == expected_csv_with_ngg_pam_legacy
 
     def test_with_ngg_pam_non_legacy(
-        self, tmp_path, single_chromosome_fasta, expected_csv_with_ngg_pam_non_legacy
+        self,
+        tmp_path,
+        single_chromosome_fasta,
+        expected_csv_with_ngg_pam_non_legacy,
     ):
         """Test that we can run the script with NGG PAM in legacy mode"""
         d = tmp_path / "test"
@@ -436,7 +450,10 @@ class TestGather:
         assert outfile.read_text() == expected_csv_with_ngg_pam_non_legacy
 
     def test_with_ngn_pam_legacy(
-        self, tmp_path, single_chromosome_fasta, expected_csv_with_ngn_pam_legacy
+        self,
+        tmp_path,
+        single_chromosome_fasta,
+        expected_csv_with_ngn_pam_legacy,
     ):
         """Test that we can run the script with NGN PAM"""
         d = tmp_path / "test"
@@ -454,7 +471,10 @@ class TestGather:
         assert outfile.read_text() == expected_csv_with_ngn_pam_legacy
 
     def test_with_ngn_pam_non_legacy(
-        self, tmp_path, single_chromosome_fasta, expected_csv_with_ngn_pam_non_legacy
+        self,
+        tmp_path,
+        single_chromosome_fasta,
+        expected_csv_with_ngn_pam_non_legacy,
     ):
         """Test that we can run the script with NGN PAM"""
         d = tmp_path / "test"
@@ -490,7 +510,9 @@ class TestGather:
             verbose=False,
             legacy_mode=True,
         )
-        assert outfile.read_text() == expected_csv_with_multiple_chromosomes_legacy
+        assert (
+            outfile.read_text() == expected_csv_with_multiple_chromosomes_legacy
+        )
 
     def test_with_multiple_chromosomes_non_legacy(
         self,
@@ -511,7 +533,10 @@ class TestGather:
             verbose=False,
             legacy_mode=False,
         )
-        assert outfile.read_text() == expected_csv_with_multiple_chromosomes_non_legacy
+        assert (
+            outfile.read_text()
+            == expected_csv_with_multiple_chromosomes_non_legacy
+        )
 
     def test_invalid_chromosome_header_raises_value_error(self, tmp_path):
         """Test that a FASTA file without a valid chromosome name raises ValueError"""
@@ -520,7 +545,9 @@ class TestGather:
         infile = d / "test.fasta"
         infile.write_text(">invalid_header without proper format\nGATCACATGC")
         outfile = d / "test.csv"
-        with pytest.raises(ValueError, match="Could not extract chromosome name from header"):
+        with pytest.raises(
+            ValueError, match="Could not extract chromosome name from header"
+        ):
             gather.gather(
                 inputfile=infile,
                 outputfile=outfile,
