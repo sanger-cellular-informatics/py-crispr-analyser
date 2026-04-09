@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.2 (2026-04-09)
+
+### Added or Changed
+- lowered the Python version required from 3.12 to 3.10
+
 ## v1.1.1 (2026-03-13)
 
 ### Added or Changed

@@ -6,7 +6,7 @@ The Python CRISPR Analyser is a set of libraries and scripts that allows you to 
 
 For the efficient search for CRISPR off-targets, Python CRISPR Analyser supports CUDA on Linux platforms.
 
-py-crispr-analyser uses Python 3.12 or later and is tested on Linux and MacOS. It has not been tested on Windows.
+py-crispr-analyser uses Python 3.10 or later and is tested on Linux and MacOS. It has not been tested on Windows.
 
 ## Documentation
 
