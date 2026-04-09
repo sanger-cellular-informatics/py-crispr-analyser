@@ -452,7 +452,9 @@ def test_find_off_targets_cpu(
     )
 
 
-def test_find_off_targets_cpu_with_offset(query_sequence, reverse_query_sequence):
+def test_find_off_targets_cpu_with_offset(
+    query_sequence, reverse_query_sequence
+):
     """Offset shifts all returned off-target IDs by the given amount."""
     guides = np.array(
         [query_sequence, query_sequence, query_sequence], dtype=np.uint64

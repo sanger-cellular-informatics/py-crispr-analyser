@@ -9,7 +9,7 @@ stages:
 - test
 
 testing:
-  image: python:3.12-bookworm
+  image: python:3.10-bookworm
   stage: test
   script:
     - pip install .
